@@ -111,8 +111,8 @@ idt_desc_ptr:
 	.align  16
 idt:
 _idt:
-	.rept NUM_VEC
-	.quad 0
-	.endr
+	 .rept NUM_VEC
+	 .quad 0
+	 .endr
 
 idt_bottom:

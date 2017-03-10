@@ -7,6 +7,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "debug.h"
+#include "idt.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -146,6 +147,7 @@ entry (unsigned long magic, unsigned long addr)
 
 	/*initialize IDT*/
 	lidt(idt_desc_ptr);
+	init_idt();
 
 	/* Init the PIC */
 	i8259_init();
@@ -157,8 +159,9 @@ entry (unsigned long magic, unsigned long addr)
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
 	 * without showing you any output */
-	/*printf("Enabling Interrupts\n");
-	sti();*/
+	printf("Enabling Interrupts\n");
+	sti();
+	int x = 4/0;
 
 	/* Execute the first program (`shell') ... */
 
