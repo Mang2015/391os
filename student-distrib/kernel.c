@@ -144,6 +144,9 @@ entry (unsigned long magic, unsigned long addr)
 		ltr(KERNEL_TSS);
 	}
 
+	/*initialize IDT*/
+	lidt(idt_desc_ptr);
+
 	/* Init the PIC */
 	i8259_init();
 
@@ -162,4 +165,3 @@ entry (unsigned long magic, unsigned long addr)
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
 }
-
