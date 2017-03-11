@@ -148,11 +148,13 @@ entry (unsigned long magic, unsigned long addr)
 	/*initialize IDT*/
 	init_idt();
 
-	/* Init the PIC */
-	i8259_init();
-
 	/* Initialize devices, memory, filesystem, enable device interrupts on the
 	 * PIC, any other initialization stuff... */
+
+ 	/* Init the PIC */
+	i8259_init();
+
+	/* Initialize RTC and Keyboard */
 
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your

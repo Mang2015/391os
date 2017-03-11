@@ -14,23 +14,70 @@ uint8_t slave_mask; /* IRQs 8-15 */
 void
 i8259_init(void)
 {
+    outb(0xFF, MASTER_8259_PORT_DATA); // mask master PIC
+    outb(0xFF, SLAVE_8259_PORT_DATA); // mask slave PIC
+
+    outb_p(ICW1, MASTER_8259_PORT);
+    outb_p(ICW2_MASTER, MASTER_8259_PORT_DATA);
+    outb_p(ICW3_MASTER, MASTER_8259_PORT_DATA);
+
+    outb_p(ICW1, SLAVE_8259_PORT);
+    outb_p(ICW2_SLAVE, SLAVE_8259_PORT_DATA);
+    outb_p(ICW3_SLAVE, SLAVE_8259_PORT_DATA);
+
+    outb_p(ICW4, MASTER_8259_PORT_DATA);
+    outb_p(ICW4, SLAVE_8259_PORT_DATA);
 }
 
 /* Enable (unmask) the specified IRQ */
 void
 enable_irq(uint32_t irq_num)
 {
+    if(irq_num < 8)
+    {
+        master_mask = inb(MASTER_8259_PORT_DATA) & ~(1 << irq_num);
+        outb(MASTER_8259_PORT_DATA, master_mask);
+    }
+    else
+    {
+        irq_num -= 8;
+        slave_mask = inb(SLAVE_8259_PORT_DATA) & ~(1 << irq_num);
+        outb(SLAVE_8259_PORT_DATA, slave_mask);
+    }
 }
 
 /* Disable (mask) the specified IRQ */
 void
 disable_irq(uint32_t irq_num)
 {
+    if(irq_num < 8)
+    {
+        master_mask = inb(MASTER_8259_PORT_DATA) | (1 << irq_num);
+        outb(MASTER_8259_PORT_DATA, master_mask);
+    }
+    else
+    {
+        irq_num -= 8;
+        slave_mask = inb(SLAVE_8259_PORT_DATA) | (1 << irq_num);
+        outb(SLAVE_8259_PORT_DATA, slave_mask);
+    }
 }
 
 /* Send end-of-interrupt signal for the specified IRQ */
 void
 send_eoi(uint32_t irq_num)
 {
-}
+    uint8_t PIC_EOI;
 
+    if(irq_num < 8)
+    {
+        PIC_EOI = EOI | irq_num;
+        outb(MASTER_8259_PORT, PIC_EOI);
+    }
+    else
+    {
+        irq_num -= 8;
+        PIC_EOI = EOI | irq_num;
+        outb(SLAVE_8259_PORT, PIC_EOI);
+    }
+}
