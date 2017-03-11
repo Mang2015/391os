@@ -146,7 +146,6 @@ entry (unsigned long magic, unsigned long addr)
 	}
 
 	/*initialize IDT*/
-	lidt(idt_desc_ptr);
 	init_idt();
 
 	/* Init the PIC */
@@ -162,6 +161,7 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Enabling Interrupts\n");
 	sti();
 	int x = 4/0;
+	printf("after x=4/0");
 
 	/* Execute the first program (`shell') ... */
 

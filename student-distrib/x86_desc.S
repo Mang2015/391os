@@ -104,7 +104,7 @@ ldt_bottom:
 .align 4
 	.word 0 # Padding
 idt_desc_ptr:
-	.word idt_bottom - idt - 1
+	.word idt_bottom  - idt - 1
 	.long idt
 
 # idt entry has 8-byte descriptors (64 bits or one quad)
