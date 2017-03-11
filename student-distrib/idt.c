@@ -63,6 +63,8 @@ void init_idt(){
     //assign correct handler
     if(i < NUM_SYS_HANDLERS)
         SET_IDT_ENTRY(idt[i],sys_handlers[i]);
+    else if(i == SYS_CALL)
+        SET_IDT_ENTRY(idt[i],system_handler);
     else
         SET_IDT_ENTRY(idt[i],exception_handler);
 
@@ -97,8 +99,7 @@ void divide_handler(){
 
 /* debug_handler
  *
- * DESCRIPTION: Handler for Divide Error Exception (#DE)
-                Called upon a divide by 0 or result would overflow
+ * DESCRIPTION: A debug exception has been caught
  * INPUT/OUTPUT: none
  * SIDE EFFECTS: none
  */
@@ -108,104 +109,224 @@ void debug_handler(){
     while(1);
 }
 
+/* nmi_interrupt_handler
+ *
+ * DESCRIPTION: A non maskeable interrupt has been generated
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void nmi_interrupt_handler(){
     clear();
     printf("Interrupt 2 - Nonmaskable Interrupt\n");
     while(1);
 }
 
+/* breakpoint_handler
+ *
+ * DESCRIPTION: Breakpoint instruction was executed
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void breakpoint_handler(){
     clear();
     printf("Interrupt 3 - Breakpoint Exception\n");
     while(1);
 }
 
+/* overflow_handler
+ *
+ * DESCRIPTION: Overflow occured wtih arithmetic
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void overflow_handler(){
     clear();
     printf("Interrupt 4 - Overflow Exception\n");
     while(1);
 }
 
+/* bound_range_handler
+ *
+ * DESCRIPTION: Attempted to access index out of bounds
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void bound_range_handler(){
     clear();
     printf("Interrupt 5 - BOUND Range Exceeded\n");
     while(1);
 }
 
+/* invalid_opcode_handler
+ *
+ * DESCRIPTION: Processor attempted to execute an invalid
+                instruction
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void invalid_opcode_handler(){
     clear();
     printf("Interrupt 6 - Invalid Opcode\n");
     while(1);
 }
 
+/* device_not_avail_handler
+ *
+ * DESCRIPTION: Processor executed instructions hardware
+                unable to finish
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void device_not_avail_handler(){
     clear();
     printf("Interrupt 7 - Device Not Available\n");
     while(1);
 }
 
+/* dbl_fault_handler
+ *
+ * DESCRIPTION: Second exception generated while first exception
+                being handled
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void dbl_fault_handler(){
     clear();
     printf("Interrupt 8 - Double Fault\n");
     while(1);
 }
 
+/* coprocess_seg_handler
+ *
+ * DESCRIPTION: Detected a page or segment violation
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void coprocess_seg_handler(){
     clear();
     printf("Interrupt 9 - Coprocessor Segment Overrun\n");
     while(1);
 }
 
+/* inval_tss_handler
+ *
+ * DESCRIPTION: Error occured with TSS
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void inval_tss_handler(){
     clear();
     printf("Interrupt 10 - Invalid TSS\n");
     while(1);
 }
 
+/* set_not_pres_handler
+ *
+ * DESCRIPTION: Attempts to access an invalid segment
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void seg_not_pres_handler(){
     clear();
     printf("Interrupt 11 - Segment Not Present\n");
     while(1);
 }
 
+/* stack_fault_handler
+ *
+ * DESCRIPTION: Limit violation regarded with the stack or
+                not present stack segment
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void stack_fault_handler(){
     clear();
     printf("Interrupt 12 - Stack Fault Exception\n");
     while(1);
 }
 
+/* gen_protect_handler
+ *
+ * DESCRIPTION: One of many general protection violations
+                RTDC
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void gen_protect_handler(){
     clear();
     printf("Interrupt 13 - General Protection Exception\n");
     while(1);
 }
 
+/*  page_fault_handler
+ *
+ * DESCRIPTION: Processor detected error regarding pages
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void page_fault_handler(){
     clear();
     printf("Interrupt 14 - Page-Fault Exception\n");
     while(1);
 }
 
+/* float_point_handler
+ *
+ * DESCRIPTION: Floating point error occured
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void float_point_handler(){
     clear();
     printf("Interrupt 16 - x87 FPU Floating-Point Error\n");
     while(1);
 }
 
+/* align_check_handler
+ *
+ * DESCRIPTION: Detected unaligned memory when supposed to
+                be aligned
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void align_check_handler(){
     clear();
     printf("Interrupt 17 - Alignment Check Exception\n");
     while(1);
 }
 
+/* machine_check_handler
+ *
+ * DESCRIPTION: Internal machine error or bus error
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void machine_check_handler(){
     clear();
     printf("Interrupt 18 - Machine-Check Exception\n");
     while(1);
 }
 
+/* simd_float_point_handler
+ *
+ * DESCRIPTION: SIMD floating point exception
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void simd_float_point_handler(){
     clear();
     printf("Interrupt 19 - SIMD Floating-Point Exception\n");
+    while(1);
+}
+
+/* system_handler
+ *
+ * DESCRIPTION: INT 80 was invoked
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
+void system_handler(){
+    clear();
+    printf("INT 80");
     while(1);
 }

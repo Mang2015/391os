@@ -50,3 +50,5 @@ void align_check_handler();
 void machine_check_handler();
 
 void simd_float_point_handler();
+
+void system_handler();
