@@ -15,3 +15,8 @@ void rtc_init(void) {
   /* need to figure out how to change rate, am working on that */
 
 }
+
+void rtc_handler() {
+
+  test_interrupts();
+}
