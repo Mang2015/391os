@@ -19,4 +19,6 @@ void rtc_init(void) {
 void rtc_handler() {
 
   test_interrupts();
+
+  send_eoi(RTC_IRQ_NUM);
 }
