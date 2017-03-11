@@ -11,4 +11,4 @@
 #define RW_CMOS 0x71
 
 void rtc_init(void);
-void rtc_handler()
+void rtc_handler();
