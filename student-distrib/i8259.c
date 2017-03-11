@@ -17,16 +17,16 @@ i8259_init(void)
     outb(0xFF, MASTER_8259_PORT_DATA); // mask master PIC
     outb(0xFF, SLAVE_8259_PORT_DATA); // mask slave PIC
 
-    outb_p(ICW1, MASTER_8259_PORT);
-    outb_p(ICW2_MASTER, MASTER_8259_PORT_DATA);
-    outb_p(ICW3_MASTER, MASTER_8259_PORT_DATA);
+    outb(ICW1, MASTER_8259_PORT);
+    outb(ICW2_MASTER, MASTER_8259_PORT_DATA);
+    outb(ICW3_MASTER, MASTER_8259_PORT_DATA);
 
-    outb_p(ICW1, SLAVE_8259_PORT);
-    outb_p(ICW2_SLAVE, SLAVE_8259_PORT_DATA);
-    outb_p(ICW3_SLAVE, SLAVE_8259_PORT_DATA);
+    outb(ICW1, SLAVE_8259_PORT);
+    outb(ICW2_SLAVE, SLAVE_8259_PORT_DATA);
+    outb(ICW3_SLAVE, SLAVE_8259_PORT_DATA);
 
-    outb_p(ICW4, MASTER_8259_PORT_DATA);
-    outb_p(ICW4, SLAVE_8259_PORT_DATA);
+    outb(ICW4, MASTER_8259_PORT_DATA);
+    outb(ICW4, SLAVE_8259_PORT_DATA);
 }
 
 /* Enable (unmask) the specified IRQ */
