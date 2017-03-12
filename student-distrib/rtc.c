@@ -29,12 +29,13 @@ void rtc_handler() {
   uint32_t flags;
 //  save_flags(flags);
 
-  test_interrupts();
+  printf("a");
+  //test_interrupts();
   outb(STAT_REG_C,RTC_PORT);
   inb(RW_CMOS);
 
   send_eoi(RTC_IRQ_NUM);
 
  // restore_flags(flags);
-  iret();
+  //iret();
 }
