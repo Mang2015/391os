@@ -57,6 +57,4 @@ void machine_check_handler();
 void simd_float_point_handler();
 
 void system_handler();
-
-void pic_handler();
 #endif

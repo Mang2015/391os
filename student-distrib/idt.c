@@ -24,6 +24,7 @@ static uint32_t sys_handlers[NUM_SYS_HANDLERS] = {
     (uint32_t)simd_float_point_handler
 };
 
+
 /* init_idt
  *
  * DESCRIPTION: Initializes IDT by looping throught table and setting
@@ -67,8 +68,6 @@ void init_idt(){
         SET_IDT_ENTRY(idt[i],system_handler);
     /*else if(i == 0x21)
         SET_IDT_ENTRY(idt[i],keyboard_handler);*/
-    else if (i >= 0x20 && i <= 0x2F)
-        SET_IDT_ENTRY(idt[i],pic_handler);
     else{
         idt[i].present = 0;
         SET_IDT_ENTRY(idt[i],exception_handler);
@@ -87,12 +86,6 @@ void init_idt(){
 void exception_handler(){
     clear();
     printf("Unknown error occured");
-    while(1);
-}
-
-void pic_handler(){
-    clear();
-    printf("pic interrupt");
     while(1);
 }
 
