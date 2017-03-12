@@ -61,14 +61,18 @@ void init_idt(){
       idt[i].dpl = RING3;
 
     //assign correct handler
-    if(i < NUM_SYS_HANDLERS)
+    if(i < NUM_SYS_HANDLERS && i != 15)
         SET_IDT_ENTRY(idt[i],sys_handlers[i]);
     else if(i == SYS_CALL)
         SET_IDT_ENTRY(idt[i],system_handler);
-    else if(i == 0x21)
-        SET_IDT_ENTRY(idt[i],keyboard_handler);
-    else
+    /*else if(i == 0x21)
+        SET_IDT_ENTRY(idt[i],keyboard_handler);*/
+    else if (i >= 0x20 && i <= 0x2F)
+        SET_IDT_ENTRY(idt[i],pic_handler);
+    else{
+        idt[i].present = 0;
         SET_IDT_ENTRY(idt[i],exception_handler);
+    }
 
   }
 
@@ -83,6 +87,12 @@ void init_idt(){
 void exception_handler(){
     clear();
     printf("Unknown error occured");
+    while(1);
+}
+
+void pic_handler(){
+    clear();
+    printf("pic interrupt");
     while(1);
 }
 

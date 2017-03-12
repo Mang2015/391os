@@ -58,4 +58,5 @@ void simd_float_point_handler();
 
 void system_handler();
 
+void pic_handler();
 #endif
