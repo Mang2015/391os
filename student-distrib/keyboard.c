@@ -38,8 +38,9 @@ void keyboard_handler()
         1) create the mapping mechanism
         2) call end of interrupt signal
     */
-    uint32_t flags;
- //   save_flags(flags);
+    cli();
+//    uint32_t flags;
+//    save_flags(flags);
 
     // perform mapping mechanism
     uint8_t keyboard_read, i;
@@ -50,12 +51,13 @@ void keyboard_handler()
     {
         if(keyboard_read == keyboard_input_make_array[i])
         {
-            putc(ascii_val[i]);
+            putc(keyboard_input_make_array[i]);
             break;
         }
     }
 
     send_eoi(KEYBOARD_IRQ_NUM);
+    sti();
 //    restore_flags(flags);
     iret();
 }

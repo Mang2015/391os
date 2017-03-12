@@ -155,9 +155,9 @@ entry (unsigned long magic, unsigned long addr)
 	i8259_init();
 
 	/* Initialize RTC and Keyboard */
-	//keyboard_init();
+	keyboard_init();
 
-	rtc_init();
+	//rtc_init();
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
