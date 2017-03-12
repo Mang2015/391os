@@ -1,3 +1,6 @@
+#ifndef RTC_H
+#define RTC_H
+
 #include "lib.h"
 #include "types.h"
 #include "i8259.h"
@@ -12,3 +15,5 @@
 
 void rtc_init(void);
 void rtc_handler();
+
+#endif

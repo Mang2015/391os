@@ -1,5 +1,10 @@
+#ifndef IDT_H
+#define IDT_H
+
+
 #include "x86_desc.h"
 #include "lib.h"
+#include "keyboard.h"
 
 #define SYS_CALL 0x80
 #define NUM_SYS_HANDLERS 20
@@ -52,3 +57,5 @@ void machine_check_handler();
 void simd_float_point_handler();
 
 void system_handler();
+
+#endif

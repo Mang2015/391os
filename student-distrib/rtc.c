@@ -1,6 +1,6 @@
 #include "rtc.h"
 
-unsigned char cur_val;
+uint8_t cur_val;
 
 void rtc_init(void) {
 
