@@ -26,10 +26,10 @@ static uint8_t ascii_val[36] = {
 
 void keyboard_init(void)
 {
-    uint32_t flags;
-    cli_and_save(flags);
+    //uint32_t flags;
+    //cli_and_save(flags);
     enable_irq(KEYBOARD_IRQ_NUM);
-    restore_flags(flags);
+    //restore_flags(flags);
 }
 
 void keyboard_handler()
@@ -44,6 +44,7 @@ void keyboard_handler()
 
     // perform mapping mechanism
     uint8_t keyboard_read, i;
+  //  int loopflag = 0;
 
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
 
@@ -51,13 +52,16 @@ void keyboard_handler()
     {
         if(keyboard_read == keyboard_input_make_array[i])
         {
-            putc(keyboard_input_make_array[i]);
+            putc(ascii_val[i]);
+            //loopflag = 1;
             break;
         }
     }
+    /*if(loopflag==1)
+      break;*/
 
     send_eoi(KEYBOARD_IRQ_NUM);
     sti();
 //    restore_flags(flags);
-    iret();
+    //iret();
 }
