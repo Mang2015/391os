@@ -15,6 +15,8 @@
 #define MASTER_8259_PORT_DATA 0x21
 #define SLAVE_8259_PORT_DATA 0xA1
 
+#define SLAVE_IRQ_NUM 2
+
 /* Initialization control words to init each PIC.
  * See the Intel manuals for details on the meaning
  * of each word */

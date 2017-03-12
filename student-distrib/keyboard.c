@@ -43,6 +43,8 @@ void keyboard_handler()
         2) call end of interrupt signal
     */
 
+    cli();
+    
     // perform mapping mechanism
     uint8_t keyboard_read, i;
 
@@ -58,4 +60,5 @@ void keyboard_handler()
     }
 
     send_eoi(KEYBOARD_IRQ_NUM);
+    sti();
 }

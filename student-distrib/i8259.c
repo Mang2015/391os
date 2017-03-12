@@ -27,6 +27,8 @@ i8259_init(void)
 
     outb(ICW4, MASTER_8259_PORT_DATA);
     outb(ICW4, SLAVE_8259_PORT_DATA);
+
+    enable_irq(SLAVE_IRQ_NUM);
 }
 
 /* Enable (unmask) the specified IRQ */
@@ -36,13 +38,13 @@ enable_irq(uint32_t irq_num)
     if(irq_num < 8)
     {
         master_mask = inb(MASTER_8259_PORT_DATA) & ~(1 << irq_num);
-        outb(MASTER_8259_PORT_DATA, master_mask);
+        outb(master_mask, MASTER_8259_PORT_DATA);
     }
     else
     {
         irq_num -= 8;
         slave_mask = inb(SLAVE_8259_PORT_DATA) & ~(1 << irq_num);
-        outb(SLAVE_8259_PORT_DATA, slave_mask);
+        outb(slave_mask, SLAVE_8259_PORT_DATA);
     }
 }
 
@@ -53,13 +55,13 @@ disable_irq(uint32_t irq_num)
     if(irq_num < 8)
     {
         master_mask = inb(MASTER_8259_PORT_DATA) | (1 << irq_num);
-        outb(MASTER_8259_PORT_DATA, master_mask);
+        outb(master_mask, MASTER_8259_PORT_DATA);
     }
     else
     {
         irq_num -= 8;
         slave_mask = inb(SLAVE_8259_PORT_DATA) | (1 << irq_num);
-        outb(SLAVE_8259_PORT_DATA, slave_mask);
+        outb(slave_mask, SLAVE_8259_PORT_DATA);
     }
 }
 
@@ -72,12 +74,12 @@ send_eoi(uint32_t irq_num)
     if(irq_num < 8)
     {
         PIC_EOI = EOI | irq_num;
-        outb(MASTER_8259_PORT, PIC_EOI);
+        outb(PIC_EOI, MASTER_8259_PORT);
     }
     else
     {
         irq_num -= 8;
         PIC_EOI = EOI | irq_num;
-        outb(SLAVE_8259_PORT, PIC_EOI);
+        outb(PIC_EOI, SLAVE_8259_PORT);
     }
 }
