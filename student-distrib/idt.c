@@ -66,8 +66,10 @@ void init_idt(){
         SET_IDT_ENTRY(idt[i],sys_handlers[i]);
     else if(i == SYS_CALL)
         SET_IDT_ENTRY(idt[i],system_handler);
-    /*else if(i == 0x21)
+    /*else if(i == KEYBOARD)
         SET_IDT_ENTRY(idt[i],keyboard_handler);*/
+    else if(i == RTC)
+        SET_IDT_ENTRY(idt[i],rtc_handler);
     else{
         idt[i].present = 0;
         SET_IDT_ENTRY(idt[i],exception_handler);

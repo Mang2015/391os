@@ -5,8 +5,11 @@
 #include "x86_desc.h"
 #include "lib.h"
 #include "keyboard.h"
+#include "rtc.h"
 
 #define SYS_CALL 0x80
+#define RTC 0x28
+#define KEYBOARD 0x21
 #define NUM_SYS_HANDLERS 20
 
 #define RING0 0
