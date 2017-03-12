@@ -26,6 +26,8 @@ void rtc_init(void) {
 
 void rtc_handler() {
   //printf("%d",i++);
+  uint32_t flags;
+//  save_flags(flags);
 
   test_interrupts();
   outb(STAT_REG_C,RTC_PORT);
@@ -33,5 +35,6 @@ void rtc_handler() {
 
   send_eoi(RTC_IRQ_NUM);
 
-//  printf("leavig rtc handler\n");
+ // restore_flags(flags);
+  iret();
 }

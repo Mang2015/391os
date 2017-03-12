@@ -120,6 +120,17 @@ do {                                    \
 			: "memory", "cc"        \
 			);                      \
 } while(0)
+/* Save flags
+ * Saves the EFLAGS register into the variable "flags"*/
+#define save_flags(flags)             \
+do {                                    \
+	asm volatile("pushfl        \n      \
+			popl %0"               \
+			: "=r"(flags)           \
+			:                       \
+			: "memory", "cc"        \
+			);                      \
+} while(0)
 
 /* Set interrupt flag - enable interrupts on this processor */
 #define sti()                           \
@@ -143,5 +154,16 @@ do {                                    \
 			: "memory", "cc"        \
 			);                      \
 } while(0)
+
+/*return from interrupt*/
+#define iret()						\
+do {                                    \
+	asm volatile("iret"                  \
+			:                       \
+			:                       \
+			: "memory"        \
+			);                      \
+} while(0)
+
 
 #endif /* _LIB_H */

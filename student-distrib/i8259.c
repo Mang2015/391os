@@ -14,12 +14,11 @@ uint8_t slave_mask; /* IRQs 8-15 */
 void
 i8259_init(void)
 {
-    uint32_t flags;
-    cli_and_save(flags);
+  //  uint32_t flags;
+ //   cli_and_save(flags);
 
     master_mask = 0xFF;
     slave_mask = 0xFF;
-
 
     outb(ICW1, MASTER_8259_PORT);
     outb(ICW2_MASTER, MASTER_8259_PORT_DATA);
@@ -29,7 +28,7 @@ i8259_init(void)
     outb(ICW2_SLAVE, SLAVE_8259_PORT_DATA);
     outb(ICW3_SLAVE, SLAVE_8259_PORT_DATA);
 
-//    outb(ICW4, MASTER_8259_PORT_DATA);
+    outb(ICW4, MASTER_8259_PORT_DATA);
     outb(ICW4, SLAVE_8259_PORT_DATA);
 
     outb(master_mask, MASTER_8259_PORT_DATA); // mask master PIC
@@ -37,7 +36,7 @@ i8259_init(void)
 
     enable_irq(SLAVE_IRQ_NUM);
 
-    restore_flags(flags);
+//    restore_flags(flags);
 }
 
 /* Enable (unmask) the specified IRQ */

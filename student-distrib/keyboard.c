@@ -26,7 +26,10 @@ static uint8_t ascii_val[36] = {
 
 void keyboard_init(void)
 {
+    uint32_t flags;
+    cli_and_save(flags);
     enable_irq(KEYBOARD_IRQ_NUM);
+    restore_flags(flags);
 }
 
 void keyboard_handler()
@@ -35,8 +38,8 @@ void keyboard_handler()
         1) create the mapping mechanism
         2) call end of interrupt signal
     */
-
-    cli();
+    uint32_t flags;
+ //   save_flags(flags);
 
     // perform mapping mechanism
     uint8_t keyboard_read, i;
@@ -53,5 +56,6 @@ void keyboard_handler()
     }
 
     send_eoi(KEYBOARD_IRQ_NUM);
-    sti();
+//    restore_flags(flags);
+    iret();
 }

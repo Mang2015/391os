@@ -155,7 +155,7 @@ entry (unsigned long magic, unsigned long addr)
 	i8259_init();
 
 	/* Initialize RTC and Keyboard */
-//	keyboard_init();
+	//keyboard_init();
 
 	rtc_init();
 	/* Enable interrupts */
@@ -164,7 +164,7 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	printf("Enabling Interrupts\n");
 	sti();
-	//int x = 4/0;
+
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
