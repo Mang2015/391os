@@ -44,7 +44,7 @@ void keyboard_handler()
     */
 
     cli();
-    
+
     // perform mapping mechanism
     uint8_t keyboard_read, i;
 
