@@ -16,7 +16,35 @@ void paging_init(void)
 
     // Tim this is where your code goes
 
+    uint32_t entry = 0x0;
+    uint32_t pt_addr = (uint32_t)&page_table;
+    pt_addr /= 0x4000;
+    entry = pt_addr << 11;
+    entry += 3;
+    page_directory[0] = entry;
+
+    entry = 0x0;
+    entry += 0x1 << 21;
+    entry += 0x83;
+    page_directory[1] = entry;
+
+    int i;
+    for(i = 2; i < DIRECTORY_SIZE; i++){
+        page_directory[i] |= 0xFFFE;
+    }
+
+    entry = 0x0;
+    entry = VIDEO/0x4000 << 11;
+    entry += 3;
+    page_table[0] = entry;
+
+    for(i = 1; i < DIRECTORY_SIZE; i++){
+        page_table[i] |= 0xFFFE;
+    }
+
+
     enable_paging();
+
 }
 
 void enable_paging()
@@ -26,13 +54,13 @@ void enable_paging()
     */
 
     asm volatile(
-                "movl page_directory, %%eax"
-                "movl %%eax, cr3"
-                "movl cr0, %%eax"
-                "orl 0x80000001, %%eax"
-                "movl %%eax, cr0"
-                "movl cr4, %%eax"
-                "orl 0x00000010, %%eax"
-                "movl %%eax, cr4"
+                "movl page_directory, %%eax \n \
+                movl %%eax, %%cr3 \n \
+                movl %%cr0, %%eax \n \
+                orl 0x80000001, %%eax \n \
+                movl %%eax, %%cr0 \n \
+                movl %%cr4, %%eax \n \
+                orl 0x00000010, %%eax \n \
+                movl %%eax, %%cr4"
                 );
 }
