@@ -1,7 +1,6 @@
 #include "rtc.h"
 
 uint8_t cur_val;
-uint16_t i = 0;
 
 /* rtc_init
  *
@@ -41,17 +40,11 @@ void rtc_init(void) {
  * SIDE EFFECTS: Clears content in register C to enable new interrupts. Send EOI to PIC
  */
 void rtc_handler() {
-  //printf("%d",i++);
-  uint32_t flags;
-//  save_flags(flags);
 
-  //printf("rtc");
   test_interrupts();
   outb(STAT_REG_C,RTC_PORT);
   inb(RW_CMOS);
 
   send_eoi(RTC_IRQ_NUM);
 
- // restore_flags(flags);
-  //iret();
 }
