@@ -24,6 +24,12 @@ static uint8_t ascii_val[36] = {
 
 };
 
+/* keyboard_init
+ *
+ * DESCRIPTION: Enables keyboard IRQ on PIC
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: none
+ */
 void keyboard_init(void)
 {
     //uint32_t flags;
@@ -32,6 +38,15 @@ void keyboard_init(void)
     //restore_flags(flags);
 }
 
+/* keyboard_handler
+ *
+ * DESCRIPTION: Handler called by IDT in response to a keyboard interrupt.
+ *              Reads in make code of key from port, loops through an array to
+ *              find the corresponding index for the appropriate Ascii value, and
+ *              then puts the ascii value to screen.
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: Sends EOI to PIC(S)
+ */
 void keyboard_handler()
 {
     /*

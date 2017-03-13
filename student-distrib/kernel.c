@@ -159,7 +159,11 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize RTC and Keyboard */
 	keyboard_init();
 
+<<<<<<< Updated upstream
 //	rtc_init();
+=======
+	rtc_init();
+>>>>>>> Stashed changes
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
@@ -168,6 +172,7 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
 	int *x = NULL;
 	*x = 3;
+
 
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
