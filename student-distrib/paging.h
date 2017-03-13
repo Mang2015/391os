@@ -9,6 +9,11 @@
 #define DIRECTORY_SIZE 1024
 #define PAGE_SIZE (DIRECTORY_SIZE * 4)
 #define VIDEO 0xB8000
+#define KERNEL 0x400000
+
+#define RW 0x02
+#define RWON 0x03
+#define SRWON 0x83
 
 uint32_t page_directory[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
 uint32_t page_table[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));

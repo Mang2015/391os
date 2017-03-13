@@ -28,24 +28,24 @@ void paging_init(void)
         page_directory[i] = 0x02;
     }
 
-    // initialize first 4MB in memory
+    // initialize first 4MB in memory at 0
     uint32_t entry = (uint32_t)page_table;
-    entry |= 0x03;
+    entry |= RWON;
     page_directory[0] = entry;
 
     // initialize the kernel memory at 4MB
-    entry = 0x400000;
-    entry |= 0x83;
+    entry = KERNEL;
+    entry |= SRWON;
     page_directory[1] = entry;
 
     // fill the page tables so that pages are properly initialized
     for(i = 0; i < DIRECTORY_SIZE; i++){
-        page_table[i] = 0x02;
+        page_table[i] = RW;
     }
 
     // properly handle the video memory segment
     entry = VIDEO;
-    entry |= 3;
+    entry |= RWON;
     page_table[VIDEO >> 12] = entry;
 
     // enable paging used the appropriate control registers
