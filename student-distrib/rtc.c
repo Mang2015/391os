@@ -41,7 +41,7 @@ void rtc_init(void) {
  */
 void rtc_handler() {
 
-  test_interrupts();
+  //test_interrupts();
   outb(STAT_REG_C,RTC_PORT);
   inb(RW_CMOS);
 
