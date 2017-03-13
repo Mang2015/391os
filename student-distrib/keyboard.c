@@ -32,10 +32,8 @@ static uint8_t ascii_val[36] = {
  */
 void keyboard_init(void)
 {
-    //uint32_t flags;
-    //cli_and_save(flags);
+    // enable the IRQ on PIC associated with keyboard
     enable_irq(KEYBOARD_IRQ_NUM);
-    //restore_flags(flags);
 }
 
 /* keyboard_handler
@@ -56,24 +54,21 @@ void keyboard_handler()
 
 
     // perform mapping mechanism
-   uint8_t keyboard_read, i;
-  //  int loopflag = 0;
+    uint8_t keyboard_read, i;
 
+    // take in the port value holding the make code for letter
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
-    //printf("%d",keyboard_read);
+
+    // go through make table and ascii table to find appropriate character to echo
     for(i = 0; i < 36; i++)
     {
         if(keyboard_read == keyboard_input_make_array[i])
         {
             putc(ascii_val[i]);
-            //loopflag = 1;
             break;
         }
     }
-    /*if(loopflag==1)
-      break;*/
 
+    // send end of interrupt signal so other interrupts can be processed
     send_eoi(KEYBOARD_IRQ_NUM);
-
-    //iret();
 }

@@ -21,29 +21,29 @@ uint8_t slave_mask; /* IRQs 8-15 */
 void
 i8259_init(void)
 {
-  //  uint32_t flags;
- //   cli_and_save(flags);
-
+    // Initialize the masks
     master_mask = 0xFF;
     slave_mask = 0xFF;
 
+    // send ICW1, ICW2, ICW3 to master
     outb(ICW1, MASTER_8259_PORT);
     outb(ICW2_MASTER, MASTER_8259_PORT_DATA);
     outb(ICW3_MASTER, MASTER_8259_PORT_DATA);
 
+    // send ICW1, ICW2, ICW3 to slave
     outb(ICW1, SLAVE_8259_PORT);
     outb(ICW2_SLAVE, SLAVE_8259_PORT_DATA);
     outb(ICW3_SLAVE, SLAVE_8259_PORT_DATA);
 
+    // send ICW4 to master and slave
     outb(ICW4, MASTER_8259_PORT_DATA);
     outb(ICW4, SLAVE_8259_PORT_DATA);
 
     outb(master_mask, MASTER_8259_PORT_DATA); // mask master PIC
     outb(slave_mask, SLAVE_8259_PORT_DATA); // mask slave PIC
 
+    // enable the IRQ associated with the slave PIC
     enable_irq(SLAVE_IRQ_NUM);
-
-//    restore_flags(flags);
 }
 
 /* enable_irq
@@ -55,11 +55,13 @@ i8259_init(void)
 void
 enable_irq(uint32_t irq_num)
 {
+    // handle irq less than 8 - master
     if(irq_num < 8)
     {
         master_mask = inb(MASTER_8259_PORT_DATA) & ~(1 << irq_num);
         outb(master_mask, MASTER_8259_PORT_DATA);
     }
+    // handle irq greater than 8 - slave
     else
     {
         irq_num -= 8;
@@ -77,11 +79,13 @@ enable_irq(uint32_t irq_num)
 void
 disable_irq(uint32_t irq_num)
 {
+    // handle irq less than 8 - master
     if(irq_num < 8)
     {
         master_mask = inb(MASTER_8259_PORT_DATA) | (1 << irq_num);
         outb(master_mask, MASTER_8259_PORT_DATA);
     }
+    // handle irq greater than 8 - slave
     else
     {
         irq_num -= 8;
@@ -101,11 +105,13 @@ send_eoi(uint32_t irq_num)
 {
     uint8_t PIC_EOI;
 
+    // handle irq less than 8 - master
     if(irq_num < 8)
     {
         PIC_EOI = EOI | irq_num;
         outb(PIC_EOI, MASTER_8259_PORT);
     }
+    // handle irq greater than 8 - slave
     else
     {
         irq_num -= 8;

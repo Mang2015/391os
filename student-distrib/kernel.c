@@ -157,9 +157,12 @@ entry (unsigned long magic, unsigned long addr)
 
 	/* Initialize RTC and Keyboard */
 	keyboard_init();
+
+	rtc_init();
+
+	/* Initialize paging */
 	paging_init();
 
-	//rtc_init();
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
@@ -167,8 +170,8 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Enabling Interrupts\n");
 	sti();
 
-	int *x = NULL;
-	*x = 32;
+	// int *x = NULL;
+	// *x = 32;
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");

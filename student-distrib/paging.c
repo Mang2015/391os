@@ -1,6 +1,14 @@
 // this is going to be the paging.c file
 #include "paging.h"
 
+/* paging_init
+ *
+ * DESCRIPTION: Enables paging so that when memory is improperly accessed, the OS
+                throws a page fault exception
+ *
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: Enables paging
+ */
 void paging_init(void)
 {
     /*
@@ -14,29 +22,44 @@ void paging_init(void)
         3) find a way to fill the space after kernel memory with blank essesntially
     */
 
+    // initialize entire page directory
     int i;
     for(i = 0; i < DIRECTORY_SIZE; i++){
         page_directory[i] = 0x02;
     }
 
+    // initialize first 4MB in memory
     uint32_t entry = (uint32_t)page_table;
     entry |= 0x03;
     page_directory[0] = entry;
 
+    // initialize the kernel memory at 4MB
     entry = 0x400000;
     entry |= 0x83;
     page_directory[1] = entry;
 
+    // fill the page tables so that pages are properly initialized
     for(i = 0; i < DIRECTORY_SIZE; i++){
         page_table[i] = 0x02;
     }
+
+    // properly handle the video memory segment
     entry = VIDEO;
     entry |= 3;
     page_table[VIDEO >> 12] = entry;
 
+    // enable paging used the appropriate control registers
     enable_paging();
 }
 
+/* enable_paging
+ *
+ * DESCRIPTION: Enables paging so that when memory is improperly accessed, the OS
+                throws a page fault exception
+ *
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: Enables paging
+ */
 void enable_paging()
 {
     asm volatile(
