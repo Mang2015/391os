@@ -11,10 +11,8 @@ void paging_init(void)
         2) so basically here we need to initialize the 32 bits in each page table in each
            page directory
 
-        3) find a way to fill the space after kernel memory with blank bullshit essesntially
+        3) find a way to fill the space after kernel memory with blank essesntially
     */
-
-    // Tim this is where your code goes
 
     int i;
     for(i = 0; i < DIRECTORY_SIZE; i++){
@@ -28,12 +26,6 @@ void paging_init(void)
     entry = 0x400000;
     entry |= 0x83;
     page_directory[1] = entry;
-    //
-    // int i;
-    // for(i = 2; i < DIRECTORY_SIZE; i++){
-    //     page_directory[i] = 0x02;
-    // }
-
 
     for(i = 0; i < DIRECTORY_SIZE; i++){
         page_table[i] = 0x02;
@@ -47,18 +39,14 @@ void paging_init(void)
 
 void enable_paging()
 {
-    /*
-        This is where the assembly code is going to go
-    */
-
     asm volatile(
                 "movl %0, %%eax \n \
                 movl %%eax, %%cr3 \n \
                 movl %%cr4, %%eax \n \
-                orl 0x00000010, %%eax \n \
+                orl $0x00000010, %%eax \n \
                 movl %%eax, %%cr4 \n \
                 movl %%cr0, %%eax \n \
-                orl 0x80000000, %%eax \n \
+                orl $0x80000001, %%eax \n \
                 movl %%eax, %%cr0"
                 :
                 :"r"(page_directory)

@@ -157,8 +157,8 @@ entry (unsigned long magic, unsigned long addr)
 
 	/* Initialize RTC and Keyboard */
 	keyboard_init();
-
 	paging_init();
+
 	//rtc_init();
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
