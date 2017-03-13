@@ -16,6 +16,11 @@ void paging_init(void)
 
     // Tim this is where your code goes
 
+    int i;
+    for(i = 0; i < DIRECTORY_SIZE; i++){
+        page_directory[i] = 0x02;
+    }
+
     uint32_t entry = (uint32_t)page_table;
     entry |= 0x03;
     page_directory[0] = entry;
@@ -23,11 +28,11 @@ void paging_init(void)
     entry = 0x400000;
     entry |= 0x83;
     page_directory[1] = entry;
-
-    int i;
-    for(i = 2; i < DIRECTORY_SIZE; i++){
-        page_directory[i] = 0x02;
-    }
+    //
+    // int i;
+    // for(i = 2; i < DIRECTORY_SIZE; i++){
+    //     page_directory[i] = 0x02;
+    // }
 
 
     for(i = 0; i < DIRECTORY_SIZE; i++){
@@ -52,10 +57,10 @@ void enable_paging()
                 "movl %0, %%eax \n \
                 movl %%eax, %%cr3 \n \
                 movl %%cr4, %%eax \n \
-                orl 0x00000001, %%eax \n \
+                orl 0x00000010, %%eax \n \
                 movl %%eax, %%cr4 \n \
                 movl %%cr0, %%eax \n \
-                orl 0x80000010, %%eax \n \
+                orl 0x80000000, %%eax \n \
                 movl %%eax, %%cr0"
                 :
                 :"r"(page_directory)
