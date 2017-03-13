@@ -13,7 +13,7 @@
 #define STAT_REG_C  0x8C
 #define ENABLE_BIT_SIX  0x40
 #define RTC_IRQ_NUM 8
-#define RATE 5
+#define RATE 14
 
 extern void rtc_init(void);
 extern void rtc_handler();

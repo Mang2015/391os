@@ -157,14 +157,14 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize RTC and Keyboard */
 	keyboard_init();
 
-	//rtc_init();
+	rtc_init();
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
 	 * without showing you any output */
 	printf("Enabling Interrupts\n");
 	sti();
-	
+
 
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */

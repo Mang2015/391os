@@ -13,11 +13,11 @@ void rtc_init(void) {
   outb(cur_val | ENABLE_BIT_SIX, RW_CMOS);  // "OR" current value with 0x40 and write into CMOS port
 
   /* need to figure out how to change rate, am working on that */
-/*  outb(STAT_REG_A, RTC_PORT);             // Select status register B and disable NMI
+  outb(STAT_REG_A, RTC_PORT);             // Select status register B and disable NMI
   cur_val = inb(RW_CMOS);                 // load cur_val with value in status register B
   outb(STAT_REG_A, RTC_PORT);             // reset the index back into RTC_PORT
   outb((cur_val & 0xF0) | RATE, RW_CMOS);
-*/
+
 
   enable_irq(RTC_IRQ_NUM);                // enable on PIC
 
