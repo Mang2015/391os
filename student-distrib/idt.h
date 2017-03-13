@@ -6,6 +6,7 @@
 #include "lib.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "idt_wrappers.h"
 
 #define SYS_CALL 0x80
 #define RTC 0x28
@@ -17,7 +18,12 @@
 #define RING2 2
 #define RING3 3
 
+#define READY 1
+#define NOT 0
+
 extern void init_idt();
+
+
 
 void exception_handler();
 

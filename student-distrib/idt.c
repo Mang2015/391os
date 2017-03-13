@@ -67,9 +67,9 @@ void init_idt(){
     else if(i == SYS_CALL)
         SET_IDT_ENTRY(idt[i],system_handler);
     else if(i == KEYBOARD)
-        SET_IDT_ENTRY(idt[i],keyboard_handler);
+        SET_IDT_ENTRY(idt[i],keyboard_handler_wrapper);
     else if(i == RTC)
-        SET_IDT_ENTRY(idt[i],rtc_handler);
+        SET_IDT_ENTRY(idt[i],rtc_handler_wrapper);
     else{
         idt[i].present = 0;
         SET_IDT_ENTRY(idt[i],exception_handler);
@@ -78,6 +78,8 @@ void init_idt(){
   }
 
 }
+
+
 
 /* exception_handler
  *
@@ -260,7 +262,7 @@ void stack_fault_handler(){
  * SIDE EFFECTS: none
  */
 void gen_protect_handler(){
-    clear();
+  //  clear();
     printf("Interrupt 13 - General Protection Exception\n");
     while(1);
 }

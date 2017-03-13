@@ -156,14 +156,8 @@ do {                                    \
 } while(0)
 
 /*return from interrupt*/
-#define iret()						\
-do {                                    \
-	asm volatile("iret"                  \
-			:                       \
-			:                       \
-			: "memory"        \
-			);                      \
-} while(0)
+#define iret() asm("iret")
+
 
 
 #endif /* _LIB_H */
