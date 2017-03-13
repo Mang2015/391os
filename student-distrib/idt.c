@@ -88,6 +88,7 @@ void init_idt(){
  * SIDE EFFECTS: none
  */
 void exception_handler(){
+    cli();
     clear();
     printf("Unknown error occured");
     while(1);
@@ -101,6 +102,7 @@ void exception_handler(){
  * SIDE EFFECTS: none
  */
 void divide_handler(){
+    cli();
     clear();
     printf("Interrupt 0 - Divide Error Exception\n");
     while(1);
@@ -113,6 +115,7 @@ void divide_handler(){
  * SIDE EFFECTS: none
  */
 void debug_handler(){
+    cli();
     clear();
     printf("Interrupt 1 - Debug Exception\n");
     while(1);
@@ -125,6 +128,7 @@ void debug_handler(){
  * SIDE EFFECTS: none
  */
 void nmi_interrupt_handler(){
+    cli();
     clear();
     printf("Interrupt 2 - Nonmaskable Interrupt\n");
     while(1);
@@ -137,6 +141,7 @@ void nmi_interrupt_handler(){
  * SIDE EFFECTS: none
  */
 void breakpoint_handler(){
+    cli();
     clear();
     printf("Interrupt 3 - Breakpoint Exception\n");
     while(1);
@@ -149,6 +154,7 @@ void breakpoint_handler(){
  * SIDE EFFECTS: none
  */
 void overflow_handler(){
+    cli();
     clear();
     printf("Interrupt 4 - Overflow Exception\n");
     while(1);
@@ -161,6 +167,7 @@ void overflow_handler(){
  * SIDE EFFECTS: none
  */
 void bound_range_handler(){
+    cli();
     clear();
     printf("Interrupt 5 - BOUND Range Exceeded\n");
     while(1);
@@ -174,6 +181,7 @@ void bound_range_handler(){
  * SIDE EFFECTS: none
  */
 void invalid_opcode_handler(){
+    cli();
     clear();
     printf("Interrupt 6 - Invalid Opcode\n");
     while(1);
@@ -187,6 +195,7 @@ void invalid_opcode_handler(){
  * SIDE EFFECTS: none
  */
 void device_not_avail_handler(){
+    cli();
     clear();
     printf("Interrupt 7 - Device Not Available\n");
     while(1);
@@ -200,6 +209,7 @@ void device_not_avail_handler(){
  * SIDE EFFECTS: none
  */
 void dbl_fault_handler(){
+    cli();
     clear();
     printf("Interrupt 8 - Double Fault\n");
     while(1);
@@ -212,6 +222,7 @@ void dbl_fault_handler(){
  * SIDE EFFECTS: none
  */
 void coprocess_seg_handler(){
+    cli();
     clear();
     printf("Interrupt 9 - Coprocessor Segment Overrun\n");
     while(1);
@@ -224,6 +235,7 @@ void coprocess_seg_handler(){
  * SIDE EFFECTS: none
  */
 void inval_tss_handler(){
+    cli();
     clear();
     printf("Interrupt 10 - Invalid TSS\n");
     while(1);
@@ -236,6 +248,7 @@ void inval_tss_handler(){
  * SIDE EFFECTS: none
  */
 void seg_not_pres_handler(){
+    cli();
     clear();
     printf("Interrupt 11 - Segment Not Present\n");
     while(1);
@@ -249,6 +262,7 @@ void seg_not_pres_handler(){
  * SIDE EFFECTS: none
  */
 void stack_fault_handler(){
+    cli();
     clear();
     printf("Interrupt 12 - Stack Fault Exception\n");
     while(1);
@@ -262,6 +276,7 @@ void stack_fault_handler(){
  * SIDE EFFECTS: none
  */
 void gen_protect_handler(){
+    cli();
     clear();
     printf("Interrupt 13 - General Protection Exception\n");
     while(1);
@@ -274,6 +289,7 @@ void gen_protect_handler(){
  * SIDE EFFECTS: none
  */
 void page_fault_handler(){
+    cli();
     clear();
     printf("Interrupt 14 - Page-Fault Exception\n");
     while(1);
@@ -286,6 +302,7 @@ void page_fault_handler(){
  * SIDE EFFECTS: none
  */
 void float_point_handler(){
+    cli();
     clear();
     printf("Interrupt 16 - x87 FPU Floating-Point Error\n");
     while(1);
@@ -299,6 +316,7 @@ void float_point_handler(){
  * SIDE EFFECTS: none
  */
 void align_check_handler(){
+    cli();
     clear();
     printf("Interrupt 17 - Alignment Check Exception\n");
     while(1);
@@ -311,6 +329,7 @@ void align_check_handler(){
  * SIDE EFFECTS: none
  */
 void machine_check_handler(){
+    cli();
     clear();
     printf("Interrupt 18 - Machine-Check Exception\n");
     while(1);
@@ -323,6 +342,7 @@ void machine_check_handler(){
  * SIDE EFFECTS: none
  */
 void simd_float_point_handler(){
+    cli();
     clear();
     printf("Interrupt 19 - SIMD Floating-Point Exception\n");
     while(1);
