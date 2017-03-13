@@ -4,9 +4,14 @@
 
 #include "x86_desc.h"
 #include "lib.h"
-#include "i8259"
+#include "i8259.h"
 
-int page_directory __attribute__((aligned (number_of_bytes)));
-int page_table __attribute__((aligned (number_of_bytes)));
+#define DIRECTORY_SIZE 1024
+#define PAGE_SIZE (DIRECTORY_SIZE * 4)
+
+uint32_t page_directory __attribute__((aligned (PAGE_SIZE)));
+uint32_t page_table __attribute__((aligned (PAGE_SIZE)));
+
+extern void paging_init(void);
 
 #endif
