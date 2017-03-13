@@ -13,6 +13,6 @@ extern uint32_t page_directory[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE
 extern uint32_t page_table[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
 
 extern void paging_init(void);
-extern void paging_init_helper();
+extern void enable_paging();
 
 #endif

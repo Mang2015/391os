@@ -13,11 +13,26 @@ void paging_init(void)
 
         3) find a way to fill the space after kernel memory with blank bullshit essesntially
     */
+
+    // Tim this is where your code goes
+
+    enable_paging();
 }
 
-void paging_init_helper()
+void enable_paging()
 {
     /*
         This is where the assembly code is going to go
     */
+
+    asm volatile(
+                "movl page_directory, %%eax"
+                "movl %%eax, cr3"
+                "movl cr0, %%eax"
+                "orl 0x80000001, %%eax"
+                "movl %%eax, cr0"
+                "movl cr4, %%eax"
+                "orl 0x00000010, %%eax"
+                "movl %%eax, cr4"
+                );
 }
