@@ -9,8 +9,8 @@
 #define DIRECTORY_SIZE 1024
 #define PAGE_SIZE (DIRECTORY_SIZE * 4)
 
-uint32_t page_directory __attribute__((aligned (PAGE_SIZE)));
-uint32_t page_table __attribute__((aligned (PAGE_SIZE)));
+extern uint32_t page_directory[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
+extern uint32_t page_table[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
 
 extern void paging_init(void);
 extern void paging_init_helper();
