@@ -29,8 +29,8 @@ void rtc_handler() {
   uint32_t flags;
 //  save_flags(flags);
 
-  printf("rtc");
-  //test_interrupts();
+  //printf("rtc");
+  test_interrupts();
   outb(STAT_REG_C,RTC_PORT);
   inb(RW_CMOS);
 
