@@ -42,9 +42,7 @@ void paging_init(void)
     entry |= 3;
     page_table[VIDEO >> 12] = entry;
 
-
     enable_paging();
-
 }
 
 void enable_paging()
