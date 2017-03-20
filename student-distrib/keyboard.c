@@ -24,6 +24,25 @@ static uint8_t ascii_val[36] = {
 
 };
 
+static uint8_t ascii_val_upper[36] = {
+
+    'A', 'B', 'C', 'D', 'E', 'F',
+    'G', 'H', 'I', 'J', 'K', 'L',
+    'M', 'N', 'O', 'P', 'Q', 'R',
+    'S', 'T', 'U', 'V', 'W', 'X',
+    'Y', 'Z', '0', '1', '2', '3',
+    '4', '5', '6', '7', '8', '9'
+
+  }
+
+uint8_t line_char_buffer[128];
+uint8_t capslock_flag;
+
+uint8_t bksp_flag;
+uint8_t buffIdx;
+
+
+
 /* keyboard_init
  *
  * DESCRIPTION: Enables keyboard IRQ on PIC
@@ -59,16 +78,63 @@ void keyboard_handler()
     // take in the port value holding the make code for letter
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
 
-    // go through make table and ascii table to find appropriate character to echo
-    for(i = 0; i < 36; i++)
-    {
-        if(keyboard_read == keyboard_input_make_array[i])
-        {
-            putc(ascii_val[i]);
-            break;
-        }
-    }
+    if (keyboard_read == CAPS)
+      caps_on();                    // turn on/off caps lock
+    else if (keyboard_read == BKSP)
+      bksp_handler();
+    else if ((keyboard_read == SCROLL_UP) || (keyboard_read == SCROLL_DOWN))
+     scrollPage();
+    else
+      keyboardBuff(keyboard_read);
 
     // send end of interrupt signal so other interrupts can be processed
     send_eoi(KEYBOARD_IRQ_NUM);
+}
+
+void keyboardBuff() {
+
+
+return;
+
+}
+
+void caps_on() {
+
+  if (capslock_flag == 0)
+    capslock_flag == 1;
+  else
+    capslock_flag == 0;
+
+  return;
+
+}
+
+void bksp_handler() {
+
+
+
+return;
+
+}
+
+void scrollPage() {
+
+
+return;
+
+}
+
+void output_buffer() {
+
+  for(i = 0; i < 36; i++)
+  {
+      if(keyboard_read == keyboard_input_make_array[i])
+      {
+          putc(ascii_val[i]);
+          break;
+      }
+  }
+
+return;
+
 }
