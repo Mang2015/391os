@@ -23,3 +23,14 @@ rtc_handler_wrapper:
   call rtc_handler
   popa
   iret
+
+# system_handler_wrapper
+# Description: wrapper for system interrupt handler to follow proper
+#               interrupt stack convention
+# INPUT/OUTPUT: none
+# SIDE EFFECTS: none
+system_handler_wrapper:
+  pusha
+  call system_handler
+  popa
+  iret

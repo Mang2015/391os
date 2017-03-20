@@ -65,7 +65,7 @@ void init_idt(){
     if(i < NUM_SYS_HANDLERS && i != 15)
         SET_IDT_ENTRY(idt[i],sys_handlers[i]);
     else if(i == SYS_CALL)
-        SET_IDT_ENTRY(idt[i],system_handler);
+        SET_IDT_ENTRY(idt[i],system_handler_wrapper);
     else if(i == KEYBOARD)
         SET_IDT_ENTRY(idt[i],keyboard_handler_wrapper);
     else if(i == RTC)
@@ -345,17 +345,5 @@ void simd_float_point_handler(){
     cli();
     clear();
     printf("Interrupt 19 - SIMD Floating-Point Exception\n");
-    while(1);
-}
-
-/* system_handler
- *
- * DESCRIPTION: INT 80 was invoked
- * INPUT/OUTPUT: none
- * SIDE EFFECTS: none
- */
-void system_handler(){
-    clear();
-    printf("INT 80");
     while(1);
 }

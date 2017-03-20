@@ -7,6 +7,7 @@
 #include "keyboard.h"
 #include "rtc.h"
 #include "idt_wrappers.h"
+#include "sys_handlers.h"
 
 #define SYS_CALL 0x80
 #define RTC 0x28
@@ -65,5 +66,4 @@ void machine_check_handler();
 
 void simd_float_point_handler();
 
-void system_handler();
 #endif
