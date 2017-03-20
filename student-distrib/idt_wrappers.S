@@ -30,7 +30,20 @@ rtc_handler_wrapper:
 # INPUT/OUTPUT: none
 # SIDE EFFECTS: none
 system_handler_wrapper:
-  pusha
+  pushl %ecx
+  pushl %edx
+  pushl %ebx
+  pushl %esp
+  pushl %ebp
+  pushl %esi
+  pushl %edi
   call system_handler
-  popa
+  popl %edi
+  popl %esi
+  popl %ebp
+  popl %esp
+  popl %ebx
+  popl %edx
+  popl %ecx
+  # preserve eax as return value
   iret
