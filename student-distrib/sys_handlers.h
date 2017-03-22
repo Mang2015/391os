@@ -1,7 +1,7 @@
 #ifndef SYS_HANDLERS
 #define SYS_HANDLERS
 
-
+#include "lib.h"
 
 #define SYS_HALT    1
 #define SYS_EXECUTE 2

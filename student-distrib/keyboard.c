@@ -91,7 +91,7 @@ void keyboard_handler()
     send_eoi(KEYBOARD_IRQ_NUM);
 }
 
-void keyboardBuff() {
+void keyboardBuff(uint8_t keyboard_read) {
 
 
 return;
@@ -132,7 +132,7 @@ void output_buffer() {
 
   for(i = 0; i < buffIdx + 1; i++)
   {
-      if(keyboard_read == keyboard_input_make_array[i])
+      if(1)//keyboard_read == keyboard_input_make_array[i])
       {
           putc(ascii_val[i]);
           break;
