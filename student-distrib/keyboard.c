@@ -105,6 +105,8 @@ void caps_on() {
   else
     capslock_flag == 0;
 
+  output_buffer();
+
   return;
 
 }
@@ -126,7 +128,9 @@ return;
 
 void output_buffer() {
 
-  for(i = 0; i < 36; i++)
+  int i;
+
+  for(i = 0; i < buffIdx + 1; i++)
   {
       if(keyboard_read == keyboard_input_make_array[i])
       {
