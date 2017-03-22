@@ -33,7 +33,7 @@ static uint8_t ascii_val_upper[36] = {
     'Y', 'Z', '0', '1', '2', '3',
     '4', '5', '6', '7', '8', '9'
 
-  }
+};
 
 uint8_t line_char_buffer[128];
 uint8_t capslock_flag;
