@@ -36,7 +36,7 @@ static uint8_t ascii_val_upper[36] = {
 };
 
 uint8_t line_char_buffer[128];
-uint8_t capslock_flag;
+uint32_t capslock_flag;
 
 uint8_t bksp_flag;
 uint8_t buffIdx;
@@ -53,6 +53,9 @@ void keyboard_init(void)
 {
     // enable the IRQ on PIC associated with keyboard
     enable_irq(KEYBOARD_IRQ_NUM);
+    buffIdx = -1;
+    capslock_flag = 0;
+    bksp_flag = 0;
 }
 
 /* keyboard_handler
@@ -73,13 +76,19 @@ void keyboard_handler()
 
 
     // perform mapping mechanism
-    uint8_t keyboard_read, i;
+    uint8_t keyboard_read;
 
     // take in the port value holding the make code for letter
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
 
-    if (keyboard_read == CAPS)
-      caps_on();                    // turn on/off caps lock
+    if (keyboard_read == CAPS) {
+      if (capslock_flag != 1) {
+        capslock_flag = 1;
+      }
+      else {
+        capslock_flag = 0;
+      }
+    }                   // turn on/off caps lock
     else if (keyboard_read == BKSP)
       bksp_handler();
     else if ((keyboard_read == SCROLL_UP) || (keyboard_read == SCROLL_DOWN))
@@ -92,21 +101,32 @@ void keyboard_handler()
 }
 
 void keyboardBuff(uint8_t keyboard_read) {
+  //increase the buffer index to keep track of last place in buffer
+  buffIdx++;
+  int i;
 
+  //return if buffer overflow
+  if(buffIdx == 128)
+    return;
 
-return;
+  //add char to the buffer based on the scancode
+  for(i = 0; i < 36; i++)
+  {
+      if(keyboard_read == keyboard_input_make_array[i])
+      {
+          if(capslock_flag){
+            line_char_buffer[buffIdx] = ascii_val_upper[i];
+            break;
+          }
+          else{
+            line_char_buffer[buffIdx] = ascii_val[i];
+            break;
+          }
 
-}
-
-void caps_on() {
-
-  if (capslock_flag == 0)
-    capslock_flag == 1;
-  else
-    capslock_flag == 0;
+      }
+  }
 
   output_buffer();
-
   return;
 
 }
@@ -132,13 +152,9 @@ void output_buffer() {
 
   for(i = 0; i < buffIdx + 1; i++)
   {
-      if(1)//keyboard_read == keyboard_input_make_array[i])
-      {
-          putc(ascii_val[i]);
-          break;
-      }
+    putc(line_char_buffer[buffIdx]);
   }
 
-return;
+  return;
 
 }

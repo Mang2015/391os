@@ -1,6 +1,7 @@
 
 .globl keyboard_handler_wrapper
 .globl rtc_handler_wrapper
+.globl system_handler_wrapper
 
 # keyboard_handler_wrapper
 # Description: wrapper for keyboard interrupt handler to follow proper

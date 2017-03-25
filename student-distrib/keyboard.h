@@ -14,11 +14,9 @@
 #define SCROLL_UP 0x48
 #define SCROLL_DOWN 0x50
 
-uint8_t flags = 0;
 
 extern void keyboard_init(void);
 extern void keyboard_handler();
-extern void caps_on();
 extern void bksp_handler();
 extern void scrollPage();
 extern void keyboardBuff(uint8_t keyboard_read);
