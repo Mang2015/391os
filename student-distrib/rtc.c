@@ -46,5 +46,102 @@ void rtc_handler() {
   inb(RW_CMOS);
 
   send_eoi(RTC_IRQ_NUM);
+  int_flag = 1; //set int_flag for read_rtc
+}
 
+int32_t open_rtc(const uint8_t* filename)
+{
+    set_freq(2);
+
+    return 0;
+}
+
+int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes)
+{
+    while(!int_flag)
+    {
+        //wait for interrupt handler to finish
+    }
+
+    int_flag = 0;
+
+    return 0;
+}
+
+int32_t write_rtc(int32_t fd, const void* buf, int32_t nbytes)
+{
+    int32_t write_freq;
+
+    if(nbytes != 4 || buf == NULL)
+        return -1;
+    else
+        write_freq = *buf;
+
+    set_freq(write_freq);
+
+    return nbytes;
+}
+
+int32_t close_rtc(int32_t fd)
+{
+    set_freq(2);
+
+    return 0;
+}
+
+void set_freq(int32_t freq)
+{
+    uint8_t new_freq, old_freq;
+
+    outb(STAT_REG_A, RTC_PORT);
+    old_freq = inb(RW_CMOS);
+
+    switch(freq)
+    {
+        case 2:
+            new_freq = 0x0F;
+            break;
+
+        case 4:
+            new_freq = 0x0E;
+            break;
+
+        case 8:
+            new_freq = 0x0D;
+            break;
+
+        case 16:
+            new_freq = 0x0C;
+            break;
+
+        case 32:
+            new_freq = 0x0B;
+            break;
+
+        case 64:
+            new_freq = 0x0A;
+            break;
+
+        case 128:
+            new_freq = 0x09;
+            break;
+
+        case 256:
+            new_freq = 0x08;
+            break;
+
+        case 512:
+            new_freq = 0x07;
+            break;
+
+        case 1024:
+            new_freq = 0x06;
+            break;
+
+        default:
+            return;
+    }
+
+    outb(STAT_REG_A, RTC_PORT);
+    outb((old_freq & 0xF0) | new_freq, RW_CMOS);
 }
