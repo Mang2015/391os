@@ -75,7 +75,7 @@ int32_t write_rtc(int32_t fd, const void* buf, int32_t nbytes)
     if(nbytes != 4 || buf == NULL)
         return -1;
     else
-        write_freq = *buf;
+        write_freq = *((int32_t*)buf);
 
     set_freq(write_freq);
 
