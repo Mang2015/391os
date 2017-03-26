@@ -159,7 +159,6 @@ void keyboardBuff(uint8_t keyboard_read) {
       }
   }
 
-  printf((int8_t *)line_char_buffer);
   return;
 
 }

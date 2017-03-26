@@ -9,7 +9,7 @@ int32_t terminal_close(){
 }
 
 int32_t terminal_write(const void* buf, int32_t nbytes){
-    int i;
+    //int i;
     int bytes_written = 0;
 
     cli();
@@ -20,7 +20,7 @@ int32_t terminal_write(const void* buf, int32_t nbytes){
         putc(buf[i]);
       bytes_written++;
     }*/
-    bytes_written = printf((int8_t *)buf);
+    bytes_written = printf("%s",buf);
     sti();
 
     return bytes_written;
@@ -28,13 +28,13 @@ int32_t terminal_write(const void* buf, int32_t nbytes){
 
 /*In the case of the keyboard, read should return data from one line that has been terminated by pressing
 Enter, or as much as ts in the buffer from one such line.*/
-int32_t terminal_read(char* buf, int byte_count){
-    int totalBufNum = get_buf_idx();
+int32_t terminal_read(void* buf, int byte_count){
+    /*int totalBufNum = get_buf_idx();
     int i;
     for(i=0;i<=totalBufNum;i++){
       line_char_buffer[i] = buf[i];
-      totalwritten++;
     }
 
-    return i;
+    return i;*/
+    return -1;
 }
