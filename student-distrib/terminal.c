@@ -1,14 +1,14 @@
 #include "terminal.h"
 
-int32_t terminal_open(const uint8_t* filename){
+int32_t terminal_open(){
   return 0;
 }
 
-int32_t terminal_close(int32_t fd){
+int32_t terminal_close(){
   return 0;
 }
 
-int32_t terminal_write(int32_t fd, const void* buf, int32_t nbytes){
+int32_t terminal_write(const void* buf, int32_t nbytes){
     int i;
     int bytes_written = 0;
 
@@ -28,7 +28,7 @@ int32_t terminal_write(int32_t fd, const void* buf, int32_t nbytes){
 
 /*In the case of the keyboard, read should return data from one line that has been terminated by pressing
 Enter, or as much as ts in the buffer from one such line.*/
-int32_t terminal_read(int32_t fd, char* buf, int byte_count){
+int32_t terminal_read(char* buf, int byte_count){
     int totalBufNum = get_buf_idx();
     int i;
     for(i=0;i<=totalBufNum;i++){

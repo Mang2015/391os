@@ -166,8 +166,10 @@ void keyboardBuff(uint8_t keyboard_read) {
 
 void space_press(){
     buffIdx++;
-    if(buffIdx == 128)
+    if(buffIdx == 128){
+      buffIdx--;
       return;
+    }
 
     putc(' ');
     line_char_buffer[buffIdx] = ' ';
@@ -176,8 +178,10 @@ void space_press(){
 
 void enter_press(){
   buffIdx++;
-  if(buffIdx == 128)
+  if(buffIdx == 128){
+    buffIdx--;
     return;
+  }
 
   putc('\n');
   line_char_buffer[buffIdx] = '\n';
