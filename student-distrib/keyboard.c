@@ -217,6 +217,7 @@ void clearScreen() {
 
   clear();
   buffIdx = -1;
+  line_char_buffer[0] = ' ';
   resetCursor();
 
   return;

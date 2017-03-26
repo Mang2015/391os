@@ -6,7 +6,7 @@
 #include "i8259.h"
 #include "keyboard.h"
 
-int terminal_write(char* buf);
+int terminal_write(char* buf, int byte_count);
 int terminal_read();
 
 #endif

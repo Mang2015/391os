@@ -1,13 +1,16 @@
 #include "terminal.h"
 
-int terminal_write(char* buf){
+int terminal_write(char* buf, int byte_count){
     int i;
     int bytes_written = 0;
-    while(buf[i] != '\0'){
-      putc(buf[i]);
+    for(i=0;i<byte_count;i++){
+      if(buf[i] == '\0')
+        continue;
+      else
+        putc(buf[i]);
       bytes_written++;
-      i++;
     }
+
     return bytes_written;
 }
 
