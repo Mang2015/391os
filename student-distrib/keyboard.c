@@ -54,7 +54,7 @@ static uint8_t ascii_val_shift[47] = {
 
 };
 
-uint8_t line_char_buffer[128];
+volatile uint8_t line_char_buffer[128];
 uint32_t capslock_flag;
 uint32_t shift_flag;
 uint32_t ctrl_flag;
@@ -126,14 +126,13 @@ void keyboard_handler()
 }
 
 void keyboardBuff(uint8_t keyboard_read) {
-  //increase the buffer index to keep track of last place in buffer
-  buffIdx++;
-  int i;
 
   //return if buffer overflow
-  if(buffIdx == 128)
+  if(buffIdx == 127)
     return;
 
+  buffIdx++;
+  int i;
   //add char to the buffer based on the scancode
   for(i = 0; i < 47; i++)
   {
@@ -160,6 +159,7 @@ void keyboardBuff(uint8_t keyboard_read) {
       }
   }
 
+  printf((int8_t *)line_char_buffer);
   return;
 
 }

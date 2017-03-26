@@ -40,5 +40,7 @@ extern void CtrlStatus(uint8_t keyboard_read);
 extern void clearScreen();
 extern int get_buf_idx();
 
+volatile extern uint8_t line_char_buffer[128];
+
 
 #endif
