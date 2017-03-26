@@ -176,14 +176,8 @@ void space_press(){
 }
 
 void enter_press(){
-  buffIdx++;
-  if(buffIdx == 128){
-    buffIdx--;
-    return;
-  }
-
+  buffIdx = -1;
   putc('\n');
-  line_char_buffer[buffIdx] = '\n';
   return;
 }
 

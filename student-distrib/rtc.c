@@ -144,4 +144,5 @@ void set_freq(int32_t freq)
 
     outb(STAT_REG_A, RTC_PORT);
     outb((old_freq & 0xF0) | new_freq, RW_CMOS);
-}*/
+}
+*/
