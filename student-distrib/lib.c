@@ -246,6 +246,10 @@ void terminal_scroll(){
    *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' ';
  }
 
+void resetCursor() {
+  screen_x = 0;
+  screen_y = 0;
+}
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
 *   Inputs: uint32_t value = number to convert

@@ -7,6 +7,7 @@
 #include "i8259.h"
 #include "terminal.h"
 
+
 #define KEYBOARD_BUFFER_PORT 0x60
 #define KEYBOARD_STATUS_PORT 0x64
 #define KEYBOARD_IRQ_NUM 1
@@ -16,6 +17,13 @@
 #define SCROLL_DOWN 0x50
 #define LSHIFT_PRESS 0x2A
 #define LSHIFT_RELEASE 0xAA
+#define RSHIFT_PRESS 0x36
+#define RSHIFT_RELEASE 0xB6
+#define CTRL_PRESS 0x1D
+#define CTRL_RELEASE 0x9D
+#define L_CLEAR   0x26
+#define ENTER_PRESS 0x1C
+#define SPACE_PRESS 0x39
 
 
 extern void keyboard_init(void);
@@ -25,5 +33,8 @@ extern void scrollPage();
 extern void keyboardBuff(uint8_t keyboard_read);
 extern void output_buffer();
 extern void LRshift(uint8_t keyboard_read);
+extern void CtrlStatus(uint8_t keyboard_read);
+extern void clearScreen();
+
 
 #endif

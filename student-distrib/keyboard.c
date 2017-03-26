@@ -57,6 +57,7 @@ static uint8_t ascii_val_shift[47] = {
 uint8_t line_char_buffer[128];
 uint32_t capslock_flag;
 uint32_t shift_flag;
+uint32_t ctrl_flag;
 
 uint8_t buffIdx;
 
@@ -75,6 +76,7 @@ void keyboard_init(void)
     buffIdx = -1;
     capslock_flag = 0;
     shift_flag = 0;
+    ctrl_flag = 0;
 
 }
 
@@ -102,7 +104,15 @@ void keyboard_handler()
     // take in the port value holding the make code for letter
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
 
-    if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE))
+    if (keyboard_read == SPACE_PRESS)
+      putc(' ');
+    if (keyboard_read == ENTER_PRESS)
+      putc('\n');
+    if ((keyboard_read == CTRL_PRESS) || (keyboard_read == CTRL_RELEASE))
+      CtrlStatus(keyboard_read);
+    if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
+      clearScreen();
+    if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
       LRshift(keyboard_read);
     if (keyboard_read == CAPS) {
       if (capslock_flag != 1) {
@@ -133,8 +143,9 @@ void keyboardBuff(uint8_t keyboard_read) {
   //add char to the buffer based on the scancode
   for(i = 0; i < 47; i++)
   {
-      if(keyboard_read == keyboard_input_make_array[i])
+    if(keyboard_read == keyboard_input_make_array[i])
       {
+        if (line_char_buffer[buffIdx] != ' ') {
           if(capslock_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_upper[i];
             putc(line_char_buffer[buffIdx]);
@@ -150,6 +161,7 @@ void keyboardBuff(uint8_t keyboard_read) {
             putc(line_char_buffer[buffIdx]);
             break;
           }
+        }
 
       }
   }
@@ -165,8 +177,25 @@ void bksp_handler() {
 }
 
 void LRshift(uint8_t keyboard_read) {
-  if (keyboard_read == LSHIFT_PRESS)
+  if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == RSHIFT_PRESS))
     shift_flag = 1;
   else
     shift_flag = 0;
+}
+
+void CtrlStatus(uint8_t keyboard_read) {
+  if (keyboard_read == CTRL_PRESS)
+    ctrl_flag = 1;
+  else
+    ctrl_flag = 0;
+}
+
+void clearScreen() {
+
+  clear();
+  line_char_buffer[buffIdx] = ' ';
+  buffIdx--;
+  resetCursor();
+
+  return;
 }
