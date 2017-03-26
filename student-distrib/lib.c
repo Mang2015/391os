@@ -162,7 +162,7 @@ format_char_switch:
 * int32_t puts(int8_t* s);
 *   Inputs: int_8* s = pointer to a string of characters
 *   Return Value: Number of bytes written
-*	Function: Output a string to the console 
+*	Function: Output a string to the console
 */
 
 int32_t
@@ -181,16 +181,26 @@ puts(int8_t* s)
 * void putc(uint8_t c);
 *   Inputs: uint_8* c = character to print
 *   Return Value: void
-*	Function: Output a character to the console 
+*	Function: Output a character to the console
 */
 
 void
 putc(uint8_t c)
 {
+    if(screen_x == NUM_COLS-1 && screen_y == NUM_ROWS-1)
+      terminal_scroll();
     if(c == '\n' || c == '\r') {
-        screen_y++;
-        screen_x=0;
+        if(screen_y == NUM_ROWS-1)
+          terminal_scroll();
+        else{
+          screen_y++;
+          screen_x=0;
+        }
     } else {
+        if(screen_x == NUM_COLS-1){
+          screen_y++;
+          screen_x = 0;
+        }
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
@@ -199,6 +209,63 @@ putc(uint8_t c)
     }
 }
 
+/*
+ * terminal_scroll
+ * Inputs: none
+ * Outputs: none
+ * Side effects: scrolls screen down and erases top line
+ *                and also clears bottom line
+*/
+void terminal_scroll(){
+    int new_dest, origin;
+    int x,y;
+    for(y=0;y<NUM_ROWS-1;y++){
+      for(x=0;x<NUM_COLS;x++){
+        origin = (y+1)*NUM_COLS + x;
+        new_dest = y*NUM_COLS + x;
+        *(uint8_t *)(video_mem + (new_dest << 1)) = *(uint8_t *)(video_mem + (origin << 1));
+      }
+    }
+
+    for(x=0;x<NUM_COLS;x++){
+      new_dest = NUM_COLS*(NUM_ROWS-1) + x;
+      *(uint8_t *)(video_mem + (new_dest << 1)) = ' ';
+    }
+
+    screen_y = NUM_ROWS-1;
+    screen_x = 0;
+
+}
+
+/* void backspace
+ *
+ * input: none
+ * output: none
+ * side effects: modififies the video memory
+ * function: once backspace is hit, erases last drawn character and replaces
+ *         with a space
+ */
+ void backspace(){
+   if(screen_x == 0){
+    screen_y = screen_y-1;
+    screen_x = NUM_COLS-1;
+  }else{
+   screen_x--;
+  }
+   *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' ';
+ }
+
+void placeCursor(int x, int y){
+
+  return;
+}
+
+void resetCursor() {
+  screen_x = 0;
+  screen_y = 0;
+  placeCursor(0,0);
+  return;
+}
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
 *   Inputs: uint32_t value = number to convert
@@ -475,11 +542,11 @@ memmove(void* dest, const void* src, uint32_t n)
 *   Inputs: const int8_t* s1 = first string to compare
 *			const int8_t* s2 = second string to compare
 *			uint32_t n = number of bytes to compare
-*	Return Value: A zero value indicates that the characters compared 
+*	Return Value: A zero value indicates that the characters compared
 *					in both strings form the same string.
-*				A value greater than zero indicates that the first 
-*					character that does not match has a greater value 
-*					in str1 than in str2; And a value less than zero 
+*				A value greater than zero indicates that the first
+*					character that does not match has a greater value
+*					in str1 than in str2; And a value less than zero
 *					indicates the opposite.
 *	Function: compares string 1 and string 2 for equality
 */
