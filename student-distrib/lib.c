@@ -207,6 +207,7 @@ putc(uint8_t c)
         screen_x %= NUM_COLS;
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
     }
+    placeCursor(screen_x, screen_y);
 }
 
 /*
@@ -234,6 +235,7 @@ void terminal_scroll(){
 
     screen_y = NUM_ROWS-1;
     screen_x = 0;
+    placeCursor(screen_x,screen_y);
 
 }
 
@@ -253,9 +255,19 @@ void terminal_scroll(){
    screen_x--;
   }
    *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' ';
+   placeCursor(screen_x, screen_y);
  }
 
 void placeCursor(int x, int y){
+
+  unsigned short position=(y*80) + x;
+
+  // cursor LOW port to vga INDEX register
+  outb(0x0F, 0x3D4);
+  outb((unsigned char)(position&0xFF), 0x3D5);
+  // cursor HIGH port to vga INDEX register
+  outb(0x0E, 0x3D4);
+  outb((unsigned char )((position>>8)&0xFF), 0x3D5);
 
   return;
 }

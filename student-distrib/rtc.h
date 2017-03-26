@@ -18,7 +18,7 @@
 extern void rtc_init(void);
 extern void rtc_handler();
 
-uint8_t int_flag = 0;
+//uint8_t int_flag = 0;
 
 int32_t open_rtc(const uint8_t* filename);
 int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes);

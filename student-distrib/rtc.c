@@ -46,10 +46,10 @@ void rtc_handler() {
   inb(RW_CMOS);
 
   send_eoi(RTC_IRQ_NUM);
-  int_flag = 1; //set int_flag for read_rtc
+  //int_flag = 1; //set int_flag for read_rtc
 }
 
-int32_t open_rtc(const uint8_t* filename)
+/*int32_t open_rtc(const uint8_t* filename)
 {
     set_freq(2);
 
@@ -144,4 +144,4 @@ void set_freq(int32_t freq)
 
     outb(STAT_REG_A, RTC_PORT);
     outb((old_freq & 0xF0) | new_freq, RW_CMOS);
-}
+}*/
