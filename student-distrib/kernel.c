@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "idt.h"
 #include "paging.h"
+#include "fs.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -62,6 +63,8 @@ entry (unsigned long magic, unsigned long addr)
 				printf("0x%x ", *((char*)(mod->mod_start+i)));
 			}
 			printf("\n");
+			if(strncmp((int8_t*)mod->string,FILESYS,LEN_COMP) == 0)
+				fs_init((uint8_t*)mod->mod_start);
 			mod_count++;
 			mod++;
 		}
@@ -169,10 +172,10 @@ entry (unsigned long magic, unsigned long addr)
 	 * without showing you any output */
 	printf("Enabling Interrupts\n");
 	sti();
-	clear();
+//	print_all_files();
+//	read_file_by_name("frame0.txt");
+	read_file_by_index();
 
-	 //int *x = NULL;
-	// *x = 32;
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");

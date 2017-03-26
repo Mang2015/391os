@@ -222,3 +222,7 @@ void clearScreen() {
 
   return;
 }
+
+int get_buf_idx(){
+    return buffIdx;
+}

@@ -38,6 +38,7 @@ extern void output_buffer();
 extern void LRshift(uint8_t keyboard_read);
 extern void CtrlStatus(uint8_t keyboard_read);
 extern void clearScreen();
+extern int get_buf_idx();
 
 
 #endif
