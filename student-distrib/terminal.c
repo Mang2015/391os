@@ -8,19 +8,20 @@ int32_t terminal_close(){
   return 0;
 }
 
-int32_t terminal_write(const void* buf, int32_t nbytes){
-    //int i;
+int32_t terminal_write(const char* buf, int32_t nbytes){
+    int i;
     int bytes_written = 0;
 
     cli();
-    /*for(i=0;i<nbytes;i++){
-      if(buf[i] == '\0')
+    for(i=0;i<nbytes;i++){
+    /*  if(buf[i] == '\0')
         continue;
-      else
-        putc(buf[i]);
+      else*/
+    //    putc(buf[i]);
+      printf("%c",buf[i]);
       bytes_written++;
-    }*/
-    bytes_written = printf("%s",buf);
+    }
+//    bytes_written = printf("%s",buf);
     sti();
 
     return bytes_written;
