@@ -13,6 +13,8 @@
 #define BKSP 0x0E
 #define SCROLL_UP 0x48
 #define SCROLL_DOWN 0x50
+#define LSHIFT_PRESS 0x2A
+#define LSHIFT_RELEASE 0xAA
 
 
 extern void keyboard_init(void);
@@ -21,5 +23,6 @@ extern void bksp_handler();
 extern void scrollPage();
 extern void keyboardBuff(uint8_t keyboard_read);
 extern void output_buffer();
+extern void LRshift(uint8_t keyboard_read);
 
 #endif
