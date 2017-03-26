@@ -28,6 +28,9 @@
 
 extern void keyboard_init(void);
 extern void keyboard_handler();
+extern void caps_on();
+extern void enter_press();
+extern void space_press();
 extern void bksp_handler();
 extern void scrollPage();
 extern void keyboardBuff(uint8_t keyboard_read);

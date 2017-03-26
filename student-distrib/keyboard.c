@@ -59,7 +59,7 @@ uint32_t capslock_flag;
 uint32_t shift_flag;
 uint32_t ctrl_flag;
 
-uint8_t buffIdx;
+int buffIdx;
 
 
 
@@ -105,24 +105,18 @@ void keyboard_handler()
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
 
     if (keyboard_read == SPACE_PRESS)
-      putc(' ');
+      space_press();
     if (keyboard_read == ENTER_PRESS)
-      putc('\n');
+      enter_press();
     if ((keyboard_read == CTRL_PRESS) || (keyboard_read == CTRL_RELEASE))
       CtrlStatus(keyboard_read);
     if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
       clearScreen();
     if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
       LRshift(keyboard_read);
-    if (keyboard_read == CAPS) {
-      if (capslock_flag != 1) {
-        capslock_flag = 1;
-      }
-      else {
-        capslock_flag = 0;
-      }
-    }                   // turn on/off caps lock
-    else if (keyboard_read == BKSP)
+    if (keyboard_read == CAPS)
+      caps_on();
+    if (keyboard_read == BKSP)
       bksp_handler();
     else
       keyboardBuff(keyboard_read);
@@ -170,10 +164,39 @@ void keyboardBuff(uint8_t keyboard_read) {
 
 }
 
+void space_press(){
+    buffIdx++;
+    if(buffIdx == 128)
+      return;
+
+    putc(' ');
+    line_char_buffer[buffIdx] = ' ';
+    return;
+}
+
+void enter_press(){
+  buffIdx++;
+  if(buffIdx == 128)
+    return;
+
+  putc('\n');
+  line_char_buffer[buffIdx] = '\n';
+  return;
+}
+
 void bksp_handler() {
+  if(buffIdx == -1)
+    return;
   buffIdx--;
   backspace();
   return;
+}
+
+void caps_on(){
+  if (capslock_flag != 1)
+    capslock_flag = 1;
+  else
+    capslock_flag = 0;
 }
 
 void LRshift(uint8_t keyboard_read) {
@@ -193,8 +216,7 @@ void CtrlStatus(uint8_t keyboard_read) {
 void clearScreen() {
 
   clear();
-  line_char_buffer[buffIdx] = ' ';
-  buffIdx--;
+  buffIdx = -1;
   resetCursor();
 
   return;

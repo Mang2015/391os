@@ -11,6 +11,11 @@ int terminal_write(char* buf){
     return bytes_written;
 }
 
+/*In the
+ase of the keyboard, read should return data from one line that has been terminated by pressing
+Enter, or as mu
+h as ts in the buffer from one su
+h line.*/
 int terminal_read(){
   return -1;
 }

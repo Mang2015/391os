@@ -187,11 +187,17 @@ puts(int8_t* s)
 void
 putc(uint8_t c)
 {
+    if(screen_x == NUM_COLS-1 && screen_y == NUM_ROWS-1)
+      terminal_scroll();
     if(c == '\n' || c == '\r') {
-        screen_y++;
-        screen_x=0;
+        if(screen_y == NUM_ROWS-1)
+          terminal_scroll();
+        else{
+          screen_y++;
+          screen_x=0;
+        }
     } else {
-        if(screen_x == NUM_COLS){
+        if(screen_x == NUM_COLS-1){
           screen_y++;
           screen_x = 0;
         }
@@ -226,6 +232,9 @@ void terminal_scroll(){
       *(uint8_t *)(video_mem + (new_dest << 1)) = ' ';
     }
 
+    screen_y = NUM_ROWS-1;
+    screen_x = 0;
+
 }
 
 /* void backspace
@@ -246,9 +255,16 @@ void terminal_scroll(){
    *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' ';
  }
 
+void placeCursor(int x, int y){
+
+  return;
+}
+
 void resetCursor() {
   screen_x = 0;
   screen_y = 0;
+  placeCursor(0,0);
+  return;
 }
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
