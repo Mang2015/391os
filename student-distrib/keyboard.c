@@ -2,6 +2,8 @@
 
 #include "keyboard.h"
 
+//DO RIGHT SHIFT, CNTROL L, ENTER
+
 static uint8_t keyboard_input_make_array[47] = {
 
     0x1E, 0x30, 0x2E, 0x20, 0x12, 0x21,     // A,B,C,D,E,F
@@ -56,7 +58,6 @@ uint8_t line_char_buffer[128];
 uint32_t capslock_flag;
 uint32_t shift_flag;
 
-uint8_t bksp_flag;
 uint8_t buffIdx;
 
 
@@ -73,7 +74,8 @@ void keyboard_init(void)
     enable_irq(KEYBOARD_IRQ_NUM);
     buffIdx = -1;
     capslock_flag = 0;
-    bksp_flag = 0;
+    shift_flag = 0;
+
 }
 
 /* keyboard_handler
@@ -112,8 +114,6 @@ void keyboard_handler()
     }                   // turn on/off caps lock
     else if (keyboard_read == BKSP)
       bksp_handler();
-    else if ((keyboard_read == SCROLL_UP) || (keyboard_read == SCROLL_DOWN))
-     scrollPage();
     else
       keyboardBuff(keyboard_read);
 
@@ -137,38 +137,31 @@ void keyboardBuff(uint8_t keyboard_read) {
       {
           if(capslock_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_upper[i];
+            putc(line_char_buffer[buffIdx]);
             break;
           }
           else if (shift_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_shift[i];
+            putc(line_char_buffer[buffIdx]);
             break;
           }
           else {
             line_char_buffer[buffIdx] = ascii_val[i];
+            putc(line_char_buffer[buffIdx]);
             break;
           }
 
       }
   }
 
-  output_buffer();
   return;
 
 }
 
 void bksp_handler() {
-
-
-
-return;
-
-}
-
-void scrollPage() {
-
-
-return;
-
+  buffIdx--;
+  backspace();
+  return;
 }
 
 void LRshift(uint8_t keyboard_read) {
@@ -176,17 +169,4 @@ void LRshift(uint8_t keyboard_read) {
     shift_flag = 1;
   else
     shift_flag = 0;
-}
-
-void output_buffer() {
-
-  int i;
-
-  for(i = 0; i < buffIdx + 1; i++)
-  {
-    putc(line_char_buffer[buffIdx]);
-  }
-
-  return;
-
 }
