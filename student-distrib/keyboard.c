@@ -95,8 +95,10 @@ void keyboard_handler()
         1) create the mapping mechanism
         2) call end of interrupt signal
     */
+    uint32_t f;
+    cli_and_save(f);
 
-
+    send_eoi(KEYBOARD_IRQ_NUM);
     // perform mapping mechanism
     uint8_t keyboard_read;
 
@@ -106,23 +108,24 @@ void keyboard_handler()
 
     if (keyboard_read == SPACE_PRESS)
       space_press();
-    if (keyboard_read == ENTER_PRESS)
+    else if (keyboard_read == ENTER_PRESS)
       enter_press();
-    if ((keyboard_read == CTRL_PRESS) || (keyboard_read == CTRL_RELEASE))
+    else if ((keyboard_read == CTRL_PRESS) || (keyboard_read == CTRL_RELEASE))
       CtrlStatus(keyboard_read);
-    if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
+    else if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
       clearScreen();
-    if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
+    else if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
       LRshift(keyboard_read);
-    if (keyboard_read == CAPS)
+    else if (keyboard_read == CAPS)
       caps_on();
-    if (keyboard_read == BKSP)
+    else if (keyboard_read == BKSP)
       bksp_handler();
     else
       keyboardBuff(keyboard_read);
 
     // send end of interrupt signal so other interrupts can be processed
-    send_eoi(KEYBOARD_IRQ_NUM);
+
+    restore_flags(f);
 }
 
 void keyboardBuff(uint8_t keyboard_read) {
@@ -131,7 +134,6 @@ void keyboardBuff(uint8_t keyboard_read) {
   if(buffIdx == 127)
     return;
 
-  buffIdx++;
   int i;
   //add char to the buffer based on the scancode
   for(i = 0; i < 47; i++)
@@ -139,6 +141,7 @@ void keyboardBuff(uint8_t keyboard_read) {
     if(keyboard_read == keyboard_input_make_array[i])
       {
         if (line_char_buffer[buffIdx] != ' ') {
+            buffIdx++;
           if(capslock_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_upper[i];
             putc(line_char_buffer[buffIdx]);

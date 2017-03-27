@@ -174,7 +174,7 @@ entry (unsigned long magic, unsigned long addr)
 	sti();
 //	print_all_files();
 //	read_file_by_name("frame0.txt");
-	read_file_by_index();
+//	read_file_by_index();
 
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
