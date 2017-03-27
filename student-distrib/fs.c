@@ -8,6 +8,10 @@ static uint32_t max_string[MAX_DENTRY];
 
 static void check_for_max();
 
+static int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry);
+static int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
+static int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
+
 void fs_init(uint8_t* fs_img){
     //pointer to beginning of fs img
     boot_block = (boot_block_head_t*)fs_img;
@@ -194,6 +198,7 @@ void read_file_by_index(){
         for(j = 0; j < FNAME_LEN; j++)
             printf("%c",d.fname[j]);
         while(key == get_buf_idx());
+        bksp_handler();
     }
     clear();
 }

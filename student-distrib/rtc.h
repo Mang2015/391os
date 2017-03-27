@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "types.h"
 #include "i8259.h"
+#include "keyboard.h"
 
 
 #define RTC_PORT  0x70
@@ -18,12 +19,15 @@
 extern void rtc_init(void);
 extern void rtc_handler();
 
-//uint8_t int_flag = 0;
+uint8_t int_flag;
 
 int32_t open_rtc(const uint8_t* filename);
 int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes);
-int32_t write_rtc(int32_t fd, const void* buf, int32_t nbytes);
+int32_t write_rtc(int32_t fd, const int32_t* buf, int32_t nbytes);
 int32_t close_rtc(int32_t fd);
 void set_freq(int32_t freq);
+
+
+void test_rtc();
 
 #endif

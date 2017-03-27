@@ -1,6 +1,7 @@
 #include "rtc.h"
 
 uint8_t cur_val;
+uint8_t disp_handler;
 
 /* rtc_init
  *
@@ -25,6 +26,8 @@ void rtc_init(void) {
   outb(STAT_REG_A, RTC_PORT);             // reset the index back into RTC_PORT
   outb((cur_val & 0xF0) | RATE, RW_CMOS);
 
+  int_flag = 0;
+  disp_handler = 0;
 
   enable_irq(RTC_IRQ_NUM);                // enable on PIC
 
@@ -45,11 +48,12 @@ void rtc_handler() {
   outb(STAT_REG_C,RTC_PORT);
   inb(RW_CMOS);
 
+  if(disp_handler) putc('1');
   send_eoi(RTC_IRQ_NUM);
-  //int_flag = 1; //set int_flag for read_rtc
+  int_flag = 1; //set int_flag for read_rtc
 }
 
-/*int32_t open_rtc(const uint8_t* filename)
+int32_t open_rtc(const uint8_t* filename)
 {
     set_freq(2);
 
@@ -68,14 +72,14 @@ int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes)
     return 0;
 }
 
-int32_t write_rtc(int32_t fd, const void* buf, int32_t nbytes)
+int32_t write_rtc(int32_t fd, const int32_t* buf, int32_t nbytes)
 {
     int32_t write_freq;
 
     if(nbytes != 4 || buf == NULL)
         return -1;
     else
-        write_freq = *((int32_t*)buf);
+        write_freq = *(buf);
 
     set_freq(write_freq);
 
@@ -145,4 +149,19 @@ void set_freq(int32_t freq)
     outb(STAT_REG_A, RTC_PORT);
     outb((old_freq & 0xF0) | new_freq, RW_CMOS);
 }
-*/
+
+
+void test_rtc(){
+    int i,key;
+    int freq[10] = {2,4,8,16,32,64,128,256,512,1024};
+    disp_handler = 1;
+    clear();
+    resetCursor();
+    for(i = 0; i < 10; i++){
+        key = get_buf_idx();
+        write_rtc(0,&freq[i],4);
+        while(key == get_buf_idx());
+        bksp_handler();
+    }
+    disp_handler = 0;
+}
