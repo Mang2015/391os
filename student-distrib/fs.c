@@ -1,17 +1,25 @@
 #include "fs.h"
 
+#define BUFLEN 40000
+//pointers to start of file system blocks
 static boot_block_head_t* boot_block;
 static dentry_t* dentries;
 static inode_t* inodes;
 static data_block_t* data_blocks;
+//array of which dentry_t have a string of size 32
 static uint32_t max_string[MAX_DENTRY];
 
 static void check_for_max();
-
 static int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry);
 static int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry);
 static int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length);
 
+/* void fs_init
+ * inputs: pointer to the start of the file system in memory
+ * outputs: none
+ * side effects: sets all global pointers to start of corresponding blocks
+ * function: initializes file system variables for further use
+ */
 void fs_init(uint8_t* fs_img){
     //pointer to beginning of fs img
     boot_block = (boot_block_head_t*)fs_img;
@@ -25,13 +33,23 @@ void fs_init(uint8_t* fs_img){
     check_for_max();
 }
 
+/* void check_for_max
+ * inputs: none
+ * outputs: none
+ * side effects: fills in max_string array with 1 for a dentry with fname size 32
+                or 0 with fname size <32
+ * function: check all dentries to see what fnames are max length
+ */
 void check_for_max(){
     uint32_t i,j,max,num_de;
     uint8_t *dstr;
+    //get number of dentries
     num_de = boot_block->num_dir_entries;
     for(i = 0; i < num_de; i++){
         max = 0;
+        //get fname
         dstr = (uint8_t*)(dentries[i].fname);
+        //check fname for \0, if exists, then length < 32
         for(j = 0; j < FNAME_LEN; j++){
             if(dstr[j] == '\0'){
                 max_string[i] = 0;
@@ -39,12 +57,20 @@ void check_for_max(){
                 break;
             }
         }
+        //no \0 found, string must be length 32
         if(max == 0){
             max_string[i] = 1;
         }
     }
 }
 
+/* int32_t read_dentry_by_name
+ * inputs: const uint8_t* fname - string of file name
+            dentry_t* dentry - pointer to dentry to be filled in
+ * outputs: int32_t - 0 for success, -1 for failure
+ * side effects: fills in given dentry pointer with copy of dentry to be searched for
+ * function: sees if dentry exists with fname, if so, copy dentry structure
+ */
 int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
     uint32_t i,len,num_de;
     len = strlen((int8_t*)fname);
@@ -80,11 +106,19 @@ int32_t read_dentry_by_name(const uint8_t* fname, dentry_t* dentry){
     return -1;
 }
 
+/* int32_t read_dentry_by_index
+ * inputs: uint32_t index - index of dentry
+            dentry_t* dentry - pointer to dentry to be filled in
+ * outputs: int32_t - 0 for success, -1 for failure
+ * side effects: fills in given dentry pointer with copy of dentry to be searched for
+ * function: gets dentry with that index, fills in given dentry with copy
+ */
 int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
     //if index is out of bounds
     if(index >= boot_block->num_dir_entries)
         return -1;
 
+    //copy dentry info over
     strncpy(dentry->fname,dentries[index].fname,FNAME_LEN);
     dentry->ftype = dentries[index].ftype;
     dentry->inode_num = dentries[index].inode_num;
@@ -92,6 +126,15 @@ int32_t read_dentry_by_index(uint32_t index, dentry_t* dentry){
     return 0;
 }
 
+/* int32_t read_data
+ * inputs: uint32_t inode - inode number to get data
+            uint32_t offset - number of bytes to offset from start
+            uint8_t* buf - char buffer to fill
+            uint32_t lenght - number of bytes to read
+ * outputs: int32_t -  number of bytes written to buffer, -1 for failure
+ * side effects: fills in given buffer with chars read from file system
+ * function: reads file system given inode, returns data to buffer
+ */
 int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length){
     uint32_t start, db_num, db_idx, counter,len;
     inode_t *i_ptr;
@@ -132,6 +175,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
             //reset pointers
             start = 0;
         }
+        //increment normally
         else
             start++;
         counter++;
@@ -140,13 +184,21 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 }
 
 
+/* void print_all_files
+ * inputs: none
+ * outputs: none
+ * side effects: prints to video memory
+ * function: prints all file names, ftype, and size
+ */
 void print_all_files(){
     uint32_t i,j;
+    //clear the screen
     clear();
     resetCursor();
     for(i = 0; i < boot_block->num_dir_entries; i++){
         printf("File name: ");
         dentry_t d;
+        //fill in dentry with directory info
         read_dentry_by_index(i,&d);
         for(j = 0; j < FNAME_LEN; j++)
             printf("%c",d.fname[j]);
@@ -156,83 +208,158 @@ void print_all_files(){
     }
 }
 
+/* void read_file_by_name
+ * inputs: int8_t* name - file name to be read
+ * outputs: none
+ * side effects: prints to video memory
+ * function: prints file contents to screen
+ */
 void read_file_by_name(int8_t* name){
     dentry_t d;
     uint32_t i,len;
-    uint8_t buf[40000];
+    uint8_t buf[BUFLEN];
+    //clear screen
     clear();
     resetCursor();
+    //if file isnt found
     if(read_dentry_by_name((uint8_t*)name,&d) == -1){
         printf("File not found");
         return;
     }
+    len = inodes[d.inode_num].len;
+    //fill in buffer with file info
+    read_data(d.inode_num,0,buf,len);
+    //write to video memory
+    terminal_write((int8_t*)buf,len);
+    //print filename
+    printf("\n");
     printf("File name: ");
     for(i = 0; i < FNAME_LEN; i++)
         printf("%c",d.fname[i]);
-    printf("\n");
-    if(d.ftype != 2){
-        printf("Invalid filetype to print");
-        return;
-    }
-    len = inodes[d.inode_num].len;
-    read_data(d.inode_num,0,buf,len);
-    terminal_write((int8_t*)buf,len);
 }
 
+/* void read_file_by_index
+ * inputs: none
+ * outputs: none
+ * side effects: prints to video memory
+ * function: prints file contents to screen of all files
+ */
 void read_file_by_index(){
     dentry_t d;
     uint32_t i,len,j;
     int32_t key;
-    uint8_t buf[40000];
+    uint8_t buf[BUFLEN];
 
+    //iterate through all files
     for(i = 0; i < boot_block->num_dir_entries; i++){
+        //used for press key to advance
         key = get_buf_idx();
+        //get dentry_t for index i
         read_dentry_by_index(i,&d);
+        //clear screen
         clear();
         resetCursor();
         len = inodes[d.inode_num].len;
+        //read in information
         read_data(d.inode_num,0,buf,len);
+        //display to screen
         terminal_write((int8_t*)buf,len);
+        //print filename
         printf("\n");
         printf("File name: ");
         for(j = 0; j < FNAME_LEN; j++)
             printf("%c",d.fname[j]);
+        //wait for key to be pressed
         while(key == get_buf_idx());
         bksp_handler();
     }
     clear();
 }
 
+/* void fopen
+ * inputs: const int8_t* fname - file name
+ * outputs: 0 for success, -1 for error
+ * side effects: none
+ * function: file open function
+ */
 uint32_t fopen(const int8_t* fname){
 
     return 0;
 }
-uint32_t fread(int32_t fd,const int8_t* buf, int32_t nbytes){
+/* void fread
+ * inputs: uint32_t inode - inode number
+            int8_t* buf - buffer to be filled
+            int32_t nbytes - number of bytes to read
+ * outputs: number of bytes read for success, -1 for error
+ * side effects: fills buf
+ * function: file read function
+ */
+uint32_t fread(uint32_t inode, int8_t* buf, int32_t nbytes){
+    return read_data(inode,0,(uint8_t*)buf,nbytes);
+}
+/* void fwrite
+ * inputs: uint32_t inode - inode number
+            int8_t* buf - buffer to be written from
+            int32_t nbytes - number of bytes to write
+ * outputs: number of bytes written for success, -1 for error
+ * side effects: writes to file
+ * function: file write function
+ */
+uint32_t fwrite(uint32_t inode, const int8_t* buf, int32_t nbytes){
+
+    return -1;
+}
+/* void fclose
+ * inputs: none
+ * outputs: 0 for success, -1 for failure
+ * side effects: none
+ * function: file close function
+ */
+uint32_t fclose(){
+    return 0;
+}
+
+/* void dopen
+ * inputs: none
+ * outputs: 0 for success, -1 for failure
+ * side effects: none
+ * function: directory open function
+ */
+uint32_t dopen(){
 
     return 0;
 }
-uint32_t fwrite(uint32_t fd, const int8_t* buf, int32_t nbytes){
+/* void dread
+ * inputs: const int8_t* fname - name of directory
+            int8_t* buf - buffer to read in to
+            int32_t nbytes - how many bytes to read
+ * outputs: 0 for success, -1 for failure
+ * side effects: none
+ * function: directory read function
+ */
+uint32_t dread(const int8_t* fname, int8_t* buf, int32_t nbytes){
 
-    return 0;
+    return -1;
 }
-uint32_t fclose(int32_t fd){
+/* void dwrite
+ * inputs: const int8_t* fname - name of directory
+            int8_t* buf - buffer to write from
+            int32_t nbytes - how many bytes to write
+ * outputs: 0 for success, -1 for failure
+ * side effects: none
+ * function: directory write function
+ */
+uint32_t dwrite(const int8_t* buf, int32_t nbytes){
 
-    return 0;
+    return -1;
 }
-
-uint32_t dopen(const int8_t* fname){
-
-    return 0;
-}
-uint32_t dread(int32_t fd,const int8_t* buf, int32_t nbytes){
-
-    return 0;
-}
-uint32_t dwrite(uint32_t fd, const int8_t* buf, int32_t nbytes){
-
-    return 0;
-}
-uint32_t dclose(int32_t fd){
+/* void dclose
+ * inputs:none
+ * outputs: 0 for success, -1 for failure
+ * side effects: none
+ * function: directory close function
+ */
+uint32_t dclose(){
 
     return 0;
 }
