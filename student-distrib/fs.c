@@ -294,8 +294,8 @@ uint32_t fopen(const int8_t* fname){
  * side effects: fills buf
  * function: file read function
  */
-uint32_t fread(uint32_t inode, int8_t* buf, int32_t nbytes){
-    return read_data(inode,0,(uint8_t*)buf,nbytes);
+uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
+    return read_data(inode,offset,(uint8_t*)buf,nbytes);
 }
 /* void fwrite
  * inputs: uint32_t inode - inode number
