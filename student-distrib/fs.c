@@ -228,7 +228,7 @@ void read_file_by_name(int8_t* name){
     }
     len = inodes[d.inode_num].len;
     //fill in buffer with file info
-    read_data(d.inode_num,0,buf,len);
+    fread(d.inode_num,0,(int8_t*)buf,len);
     //write to video memory
     terminal_write((int8_t*)buf,len);
     //print filename
@@ -261,7 +261,7 @@ void read_file_by_index(){
         resetCursor();
         len = inodes[d.inode_num].len;
         //read in information
-        read_data(d.inode_num,0,buf,len);
+        fread(d.inode_num,0,(int8_t*)buf,len);
         //display to screen
         terminal_write((int8_t*)buf,len);
         //print filename

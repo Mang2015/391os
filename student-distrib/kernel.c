@@ -173,7 +173,7 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Enabling Interrupts\n");
 	sti();
 //  print_all_files();
-//	read_file_by_name("frame3.txt");
+//	read_file_by_name("frame0.txt");
 //	read_file_by_index();
 //  test_rtc();
 
