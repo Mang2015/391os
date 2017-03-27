@@ -197,3 +197,37 @@ void read_file_by_index(){
     }
     clear();
 }
+
+uint32_t fopen(const int8_t* fname){
+
+    return 0;
+}
+uint32_t fread(int32_t fd,const int8_t* buf, int32_t nbytes){
+
+    return 0;
+}
+uint32_t fwrite(uint32_t fd, const int8_t* buf, int32_t nbytes){
+
+    return 0;
+}
+uint32_t fclose(int32_t fd){
+
+    return 0;
+}
+
+uint32_t dopen(const int8_t* fname){
+
+    return 0;
+}
+uint32_t dread(int32_t fd,const int8_t* buf, int32_t nbytes){
+
+    return 0;
+}
+uint32_t dwrite(uint32_t fd, const int8_t* buf, int32_t nbytes){
+
+    return 0;
+}
+uint32_t dclose(int32_t fd){
+
+    return 0;
+}

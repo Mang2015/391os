@@ -49,14 +49,14 @@ void print_all_files();
 void read_file_by_name(int8_t* name);
 void read_file_by_index();
 
-uint32_t fopen();
-uint32_t fread();
-uint32_t fwrite();
-uint32_t fclose();
+uint32_t fopen(const int8_t* fname);
+uint32_t fread(int32_t fd,const int8_t* buf, int32_t nbytes);
+uint32_t fwrite(uint32_t fd, const int8_t* buf, int32_t nbytes);
+uint32_t fclose(int32_t fd);
 
-uint32_t dopen();
-uint32_t dread();
-uint32_t dwrite();
-uint32_t dclose();
+uint32_t dopen(const int8_t* fname);
+uint32_t dread(int32_t fd,const int8_t* buf, int32_t nbytes);
+uint32_t dwrite(uint32_t fd, const int8_t* buf, int32_t nbytes);
+uint32_t dclose(int32_t fd);
 
 #endif
