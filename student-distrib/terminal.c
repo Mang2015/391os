@@ -14,14 +14,9 @@ int32_t terminal_write(const char* buf, int32_t nbytes){
 
     cli();
     for(i=0;i<nbytes;i++){
-    /*  if(buf[i] == '\0')
-        continue;
-      else*/
-    //    putc(buf[i]);
-      printf("%c",buf[i]);
-      bytes_written++;
+        putc(buf[i]);
+        bytes_written++;
     }
-//    bytes_written = printf("%s",buf);
     sti();
 
     return bytes_written;
