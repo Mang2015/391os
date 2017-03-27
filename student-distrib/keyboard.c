@@ -2,8 +2,6 @@
 
 #include "keyboard.h"
 
-//DO RIGHT SHIFT, CNTROL L, ENTER
-
 static uint8_t keyboard_input_make_array[47] = {
 
     0x1E, 0x30, 0x2E, 0x20, 0x12, 0x21,     // A,B,C,D,E,F
@@ -16,6 +14,7 @@ static uint8_t keyboard_input_make_array[47] = {
     0x27, 0x28, 0x33, 0x34, 0x35            // ;,'',',',.,/
 };
 
+//ascii values for the lower case numbers and symbols
 static uint8_t ascii_val[47] = {
 
     'a', 'b', 'c', 'd', 'e', 'f',
@@ -29,6 +28,7 @@ static uint8_t ascii_val[47] = {
 
 };
 
+//ascii values for the upper case numbers and symbols
 static uint8_t ascii_val_upper[47] = {
 
     'A', 'B', 'C', 'D', 'E', 'F',
@@ -41,6 +41,7 @@ static uint8_t ascii_val_upper[47] = {
     ';', 0x27, ',', '.', '/'
 };
 
+//ascii value table for shift pressed symbols and upper case letters
 static uint8_t ascii_val_shift[47] = {
 
     'A', 'B', 'C', 'D', 'E', 'F',
@@ -54,11 +55,15 @@ static uint8_t ascii_val_shift[47] = {
 
 };
 
-volatile uint8_t line_char_buffer[128];
+//keyboard buffer
+volatile uint8_t line_char_buffer[BUFFER_SIZE];
+
+//flags for important keys
 uint32_t capslock_flag;
 uint32_t shift_flag;
 uint32_t ctrl_flag;
 
+//keeps track of the last active keyboard buffer index
 int buffIdx;
 
 
@@ -73,6 +78,8 @@ void keyboard_init(void)
 {
     // enable the IRQ on PIC associated with keyboard
     enable_irq(KEYBOARD_IRQ_NUM);
+
+    //initialize the flags and the buffIdx
     buffIdx = -1;
     capslock_flag = 0;
     shift_flag = 0;
@@ -95,17 +102,21 @@ void keyboard_handler()
         1) create the mapping mechanism
         2) call end of interrupt signal
     */
+
+    //wrap in critical section
     uint32_t f;
     cli_and_save(f);
 
+    //end of interrupt signal
     send_eoi(KEYBOARD_IRQ_NUM);
-    // perform mapping mechanism
     uint8_t keyboard_read;
 
 
     // take in the port value holding the make code for letter
     keyboard_read = inb(KEYBOARD_BUFFER_PORT);
 
+
+    //choose what to do with the scan code imported from the keyboard port
     if (keyboard_read == SPACE_PRESS)
       space_press();
     else if (keyboard_read == ENTER_PRESS)
@@ -123,36 +134,47 @@ void keyboard_handler()
     else
       keyboardBuff(keyboard_read);
 
-    // send end of interrupt signal so other interrupts can be processed
-
     restore_flags(f);
+    return;
 }
 
+/* void keyboardBuff
+ * inputs: keyboard scan code
+ * outputs: none
+ * side effects: adds to the keyboard buffer, outputs to screen
+ * function: a key has been pressed so this function needs to add that key to the buffer
+              and also output it onto the terminal screen
+*/
 void keyboardBuff(uint8_t keyboard_read) {
 
   //return if buffer overflow
-  if(buffIdx == 127)
+  if(buffIdx == BUFFER_MAX_INDEX)
     return;
 
   int i;
+
   //add char to the buffer based on the scancode
   for(i = 0; i < 47; i++)
   {
     if(keyboard_read == keyboard_input_make_array[i])
       {
         if (line_char_buffer[buffIdx] != ' ') {
+            //increment buffer index if adding character
             buffIdx++;
+          //check caps lock to choose correct ascii table to draw from
           if(capslock_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_upper[i];
             putc(line_char_buffer[buffIdx]);
             break;
           }
+          //check for shift to choose correct ascii table to draw from
           else if (shift_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_shift[i];
             putc(line_char_buffer[buffIdx]);
             break;
           }
           else {
+            //if neither shift or caps lock is selected, choose appropraite ascii table
             line_char_buffer[buffIdx] = ascii_val[i];
             putc(line_char_buffer[buffIdx]);
             break;
@@ -166,63 +188,124 @@ void keyboardBuff(uint8_t keyboard_read) {
 
 }
 
+/* void space_press
+ * inputs: none
+ * outputs: none
+ * side effects: prints space to screen
+ * function: handler for when the space bar is clicked
+ */
 void space_press(){
+
+    //check for buffer overflow and handle apporpriately
     buffIdx++;
-    if(buffIdx == 128){
+    if(buffIdx == BUFFER_SIZE){
       buffIdx--;
       return;
     }
 
+    //print and add space to buffer and screen
     putc(' ');
     line_char_buffer[buffIdx] = ' ';
     return;
 }
 
+/* void enter_press
+ * inputs: none
+ * outputs: none
+ * side effects: prints enter to screen, clears buffer
+ * function: handler for when the enter key is clicked, clears buffer
+ */
 void enter_press(){
+  //clear buffer
   buffIdx = -1;
+  //print newline
   putc('\n');
   return;
 }
 
+/* void bksp_handler
+ * inputs: none
+ * outputs: none
+ * side effects: deletes last character from screen, removes from buffer
+ * function: handler for when the backspace is clicked
+ */
 void bksp_handler() {
+  //check to see that buffer is not empty
   if(buffIdx == -1)
     return;
   buffIdx--;
+  //this function deletes last drawn char
   backspace();
   return;
 }
 
+/* void caps_on
+ * inputs: none
+ * outputs: none
+ * side effects: sets caps flag
+ * function: handler for when the caps lock is clicked
+ */
 void caps_on(){
+  //change state of caps lock flag
   if (capslock_flag != 1)
     capslock_flag = 1;
   else
     capslock_flag = 0;
 }
 
+/* void LRshift
+ * inputs: keyboard scan code
+ * outputs: none
+ * side effects: sets shift flag
+ * function: handler for when the sshift bar is clicked
+ */
 void LRshift(uint8_t keyboard_read) {
+  //set shift flag
   if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == RSHIFT_PRESS))
     shift_flag = 1;
   else
     shift_flag = 0;
 }
 
+/* void CtrlStatus
+ * inputs: keyboard scancode
+ * outputs: none
+ * side effects: sets control button flag
+ * function: handler for when the control bar is clicked
+ */
 void CtrlStatus(uint8_t keyboard_read) {
+  //set control flag
   if (keyboard_read == CTRL_PRESS)
     ctrl_flag = 1;
   else
     ctrl_flag = 0;
 }
 
+/* void clearScreen
+ * inputs: none
+ * outputs: none
+ * side effects: clears the terminal screen, changes cursor location, clears buffer
+ * function: clears the scren and sets the curssor to top left
+ */
 void clearScreen() {
 
+  //clear sreen
   clear();
+  //clear biffer
   buffIdx = -1;
   line_char_buffer[0] = ' ';
+  //set cursor to top left
   resetCursor();
 
   return;
 }
 
+/* void get_buf_idx
+ * inputs: none
+ * outputs: buffIdx
+ * side effects: none
+ * function: getter function to get buffIdx
+ */
 int get_buf_idx(){
     return buffIdx;
 }

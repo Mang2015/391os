@@ -187,26 +187,32 @@ puts(int8_t* s)
 void
 putc(uint8_t c)
 {
+    //if you are in the bottom right, you need to scroll
     if(screen_x == NUM_COLS-1 && screen_y == NUM_ROWS-1)
       terminal_scroll();
     if(c == '\n' || c == '\r') {
+        //if enter is called from bottom, scroll is needed
         if(screen_y == NUM_ROWS-1)
           terminal_scroll();
+        //set new screen x and y on enter key
         else{
           screen_y++;
           screen_x=0;
         }
     } else {
+        //if the right side is reached, you want to wrap to the next line
         if(screen_x == NUM_COLS-1){
           screen_y++;
           screen_x = 0;
         }
+        //write teh character to the screen
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = c;
         *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1) + 1) = ATTRIB;
         screen_x++;
         screen_x %= NUM_COLS;
         screen_y = (screen_y + (screen_x / NUM_COLS)) % NUM_ROWS;
     }
+    //helper function to place the blinking cursor at screen x and y
     placeCursor(screen_x, screen_y);
 }
 
@@ -216,23 +222,31 @@ putc(uint8_t c)
  * Outputs: none
  * Side effects: scrolls screen down and erases top line
  *                and also clears bottom line
+ * Function: scrolls the screen when bounds are exited
 */
 void terminal_scroll(){
     int new_dest, origin;
     int x,y;
+
+    //go through each row and column and copt over the video memory from the
+    //old dest to the new dest, it is similar to shifting up video memory by a
+    //row
     for(y=0;y<NUM_ROWS-1;y++){
       for(x=0;x<NUM_COLS;x++){
         origin = (y+1)*NUM_COLS + x;
         new_dest = y*NUM_COLS + x;
+        //write to video memory
         *(uint8_t *)(video_mem + (new_dest << 1)) = *(uint8_t *)(video_mem + (origin << 1));
       }
     }
 
+    //clear the bottom row
     for(x=0;x<NUM_COLS;x++){
       new_dest = NUM_COLS*(NUM_ROWS-1) + x;
       *(uint8_t *)(video_mem + (new_dest << 1)) = ' ';
     }
 
+    //set the cursor to the bottom row
     screen_y = NUM_ROWS-1;
     screen_x = 0;
     placeCursor(screen_x,screen_y);
@@ -248,19 +262,28 @@ void terminal_scroll(){
  *         with a space
  */
  void backspace(){
+   //go to previous line if all the way on left of screen
    if(screen_x == 0){
     screen_y = screen_y-1;
     screen_x = NUM_COLS-1;
   }else{
+    //go back on character
    screen_x--;
   }
+  //write a space over the character to "delete" it from screen
    *(uint8_t *)(video_mem + ((NUM_COLS*screen_y + screen_x) << 1)) = ' ';
    placeCursor(screen_x, screen_y);
  }
 
+ /* void placeCursor
+  * inputs: x coord, y coord
+  * outputs: none
+  * side effects: changes spot of blinking cursor on screen
+  * function: helper function to schange the spot of the blinking cursor
+  */
 void placeCursor(int x, int y){
 
-  unsigned short position=(y*80) + x;
+  unsigned short position=(y*NUM_COLS) + x;
 
   // cursor LOW port to vga INDEX register
   outb(0x0F, 0x3D4);
@@ -272,12 +295,21 @@ void placeCursor(int x, int y){
   return;
 }
 
+/* void resetCursor
+ * inputs: none
+ * outputs: none
+ * side effects: moves cursor to top left
+ * function: helper function to set cursor at top left and reset screen x and y
+ */
 void resetCursor() {
+  //update screen x and y
   screen_x = 0;
   screen_y = 0;
+  //place new cursor
   placeCursor(0,0);
   return;
 }
+
 /*
 * int8_t* itoa(uint32_t value, int8_t* buf, int32_t radix);
 *   Inputs: uint32_t value = number to convert

@@ -24,6 +24,8 @@
 #define L_CLEAR   0x26
 #define ENTER_PRESS 0x1C
 #define SPACE_PRESS 0x39
+#define BUFFER_MAX_INDEX 127
+#define BUFFER_SIZE 128
 
 
 extern void keyboard_init(void);
