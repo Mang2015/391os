@@ -24,7 +24,7 @@ void rtc_init(void) {
   outb(STAT_REG_A, RTC_PORT);             // Select status register A and disable NMI
   cur_val = inb(RW_CMOS);                 // load cur_val with value in status register A
   outb(STAT_REG_A, RTC_PORT);             // reset the index back into RTC_PORT
-  outb((cur_val & 0xF0) | RATE, RW_CMOS);
+  outb((cur_val & PORTANDER) | RATE, RW_CMOS);
 
   int_flag = 0;
   disp_handler = 0;
@@ -53,110 +53,171 @@ void rtc_handler() {
   int_flag = 1; //set int_flag for read_rtc
 }
 
+/* open_rtc
+ *
+ * DESCRIPTION: Opens RTC driver
+ *
+ * INPUT/OUTPUT: input - filename
+                 output - return 0
+ * SIDE EFFECTS: Sets frequency to 2Hz
+ */
 int32_t open_rtc(const uint8_t* filename)
 {
-    set_freq(2);
+    // Set frequency to 2Hz
+    set_freq(HZ2);
 
     return 0;
 }
 
+/* read_rtc
+ *
+ * DESCRIPTION: Waits until interrupt is finished before resetting flag
+ *
+ * INPUT/OUTPUT: inputs - file descriptor
+                          buffer
+                          number of bytes to be read
+                 outputs - return 0
+ * SIDE EFFECTS: Sets interrupt flag
+ */
 int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes)
 {
+    // Wait for interrupts to be finished
     while(!int_flag)
     {
         //wait for interrupt handler to finish
     }
 
+    // Reset interrupt flag for next read
     int_flag = 0;
 
     return 0;
 }
 
+/* write_rtc
+ *
+ * DESCRIPTION: Sets the frequency of the RTC
+ *
+ * INPUT/OUTPUT: inputs - file descriptor
+                          buffer
+                          number of bytes to be read
+                 outputs - return -1 if write can't be performed
+                           return number of bytes if write is successful
+ * SIDE EFFECTS: Sets frequency
+ */
 int32_t write_rtc(int32_t fd, const int32_t* buf, int32_t nbytes)
 {
     int32_t write_freq;
 
-    if(nbytes != 4 || buf == NULL)
+    // If number of bytes is not 4 or buffer is null, return -1
+    if(nbytes != BYTE4 || buf == NULL)
         return -1;
     else
         write_freq = *(buf);
 
+    // Set the frequency
     set_freq(write_freq);
 
+    // Return the number of bytes written
     return nbytes;
 }
 
+/* close_rtc
+ *
+ * DESCRIPTION: RTC frequency gets reset
+ *
+ * INPUT/OUTPUT: input - file descriptor
+                 output - return 0
+ * SIDE EFFECTS: None
+ */
 int32_t close_rtc(int32_t fd)
 {
-    set_freq(2);
+    // Set frequency to 2Hz
+    set_freq(HZ2);
 
     return 0;
 }
 
+/* set_freq
+ *
+ * DESCRIPTION: Changes the frequency of RTC
+ *
+ * INPUT/OUTPUT: input - new frequency
+ * SIDE EFFECTS: Sets frequency, however is clipped at 1024 Hz
+ */
 void set_freq(int32_t freq)
 {
     uint8_t new_freq, old_freq;
 
+    // Save old frequency value
     outb(STAT_REG_A, RTC_PORT);
     old_freq = inb(RW_CMOS);
 
+    // Using the new rate, determine which register A code needs to be used
     switch(freq)
     {
-        case 2:
-            new_freq = 0x0F;
+        case HZ2:
+            new_freq = FREQ2;
             break;
 
-        case 4:
-            new_freq = 0x0E;
+        case HZ4:
+            new_freq = FREQ4;
             break;
 
-        case 8:
-            new_freq = 0x0D;
+        case HZ8:
+            new_freq = FREQ8;
             break;
 
-        case 16:
-            new_freq = 0x0C;
+        case HZ16:
+            new_freq = FREQ16;
             break;
 
-        case 32:
-            new_freq = 0x0B;
+        case HZ32:
+            new_freq = FREQ32;
             break;
 
-        case 64:
-            new_freq = 0x0A;
+        case HZ64:
+            new_freq = FREQ64;
             break;
 
-        case 128:
-            new_freq = 0x09;
+        case HZ128:
+            new_freq = FREQ128;
             break;
 
-        case 256:
-            new_freq = 0x08;
+        case HZ256:
+            new_freq = FREQ256;
             break;
 
-        case 512:
-            new_freq = 0x07;
+        case HZ512:
+            new_freq = FREQ512;
             break;
 
-        case 1024:
-            new_freq = 0x06;
+        case HZ1024:
+            new_freq = FREQ1024;
             break;
 
         default:
             return;
     }
 
+    // Write the new frequency to the appropriate port
     outb(STAT_REG_A, RTC_PORT);
-    outb((old_freq & 0xF0) | new_freq, RW_CMOS);
+    outb((old_freq & PORTANDER) | new_freq, RW_CMOS);
 }
 
-
+/* test_rtc
+ *
+ * DESCRIPTION: Tests the RTC for full functionality
+ *
+ * INPUT/OUTPUT: none
+ * SIDE EFFECTS: Test RTC
+ */
 void test_rtc(){
     int i,key;
-    int freq[10] = {2,4,8,16,32,64,128,256,512,1024};
+    int freq[10] = {2,4,8,16,32,64,128,256,512,1024}; // Test each frequency value
     disp_handler = 1;
     clear();
     resetCursor();
+    // Test each frequency using enter button as progression to next frequency
     for(i = 0; i < 10; i++){
         key = get_buf_idx();
         write_rtc(0,&freq[i],4);
