@@ -55,6 +55,18 @@ static uint8_t ascii_val_shift[47] = {
 
 };
 
+static uint8_t ascii_val_caps_shift[47] = {
+
+    'a', 'b', 'c', 'd', 'e', 'f',
+    'g', 'h', 'i', 'j', 'k', 'l',
+    'm', 'n', 'o', 'p', 'q', 'r',
+    's', 't', 'u', 'v', 'w', 'x',
+    'y', 'z', '0', '1', '2', '3',
+    '4', '5', '6', '7', '8', '9',
+    '~', '_', '+', '{', '}', '|',
+    ':', '"', '<', '>', '?'
+
+};
 //keyboard buffer
 volatile uint8_t line_char_buffer[BUFFER_SIZE];
 
@@ -162,7 +174,12 @@ void keyboardBuff(uint8_t keyboard_read) {
             //increment buffer index if adding character
             buffIdx++;
           //check caps lock to choose correct ascii table to draw from
-          if(capslock_flag == 1) {
+          if((capslock_flag == 1) && (shift_flag == 1)) {
+            line_char_buffer[buffIdx] = ascii_val_caps_shift[i];
+            putc(line_char_buffer[buffIdx]);
+            break;
+          }
+          else if(capslock_flag == 1) {
             line_char_buffer[buffIdx] = ascii_val_upper[i];
             putc(line_char_buffer[buffIdx]);
             break;
