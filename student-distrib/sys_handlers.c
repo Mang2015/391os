@@ -20,12 +20,12 @@ static int32_t sigreturn(void);
  * INPUT/OUTPUT: arguments passed in through registers eax,ebx,ecx,edx
  * SIDE EFFECTS: none
  */
-void system_handler(){
-    uint32_t instr,arg0,arg1,arg2;
+void system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t arg2){
+    /*uint32_t instr,arg0,arg1,arg2;
     asm ("movl %%eax,%0":"=r"(instr));
     asm ("movl %%ebx,%0":"=r"(arg0));
     asm ("movl %%ecx,%0":"=r"(arg1));
-    asm ("movl %%edx,%0":"=r"(arg2));
+    asm ("movl %%edx,%0":"=r"(arg2));*/
 
     if(instr == SYS_HALT){
         uint8_t stat = 0xFF & arg0;

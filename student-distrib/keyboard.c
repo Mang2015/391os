@@ -170,7 +170,7 @@ void keyboardBuff(uint8_t keyboard_read) {
   {
     if(keyboard_read == keyboard_input_make_array[i])
       {
-        if (line_char_buffer[buffIdx] != ' ') {
+        //if (line_char_buffer[buffIdx] != ' ') {
             //increment buffer index if adding character
             buffIdx++;
           //check caps lock to choose correct ascii table to draw from
@@ -196,7 +196,7 @@ void keyboardBuff(uint8_t keyboard_read) {
             putc(line_char_buffer[buffIdx]);
             break;
           }
-        }
+      //  }
 
       }
   }

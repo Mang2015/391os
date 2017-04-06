@@ -3,6 +3,7 @@
 .globl rtc_handler_wrapper
 .globl system_handler_wrapper
 
+
 # keyboard_handler_wrapper
 # Description: wrapper for keyboard interrupt handler to follow proper
 #               interrupt stack convention
@@ -38,7 +39,12 @@ system_handler_wrapper:
   pushl %ebp
   pushl %esi
   pushl %edi
+  pushl %edx
+  pushl %ecx
+  pushl %ebx
+  pushl %eax
   call system_handler
+  addl $16, %esp
   popl %edi
   popl %esi
   popl %ebp
