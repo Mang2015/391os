@@ -14,7 +14,7 @@
 #define SYS_SET_HANDLER  9
 #define SYS_SIGRETURN  10
 
-void system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t arg2);
+int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t arg2);
 
 
 #endif
