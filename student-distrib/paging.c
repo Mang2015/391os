@@ -25,7 +25,7 @@ void paging_init(void)
     // initialize entire page directory
     int i;
     for(i = 0; i < DIRECTORY_SIZE; i++){
-        page_directory[i] = 0x02;
+        page_directory[i] = RW;
     }
 
     // initialize first 4MB in memory at 0
