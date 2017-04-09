@@ -52,7 +52,7 @@ uint32_t fwrite(uint32_t inode, const int8_t* buf, int32_t nbytes);
 uint32_t fclose();
 
 uint32_t dopen();
-uint32_t dread(const int8_t* fname, int8_t* buf, int32_t nbytes);
+uint32_t dread(const int8_t* fname, int8_t* buf);
 uint32_t dwrite(const int8_t* buf, int32_t nbytes);
 uint32_t dclose();
 

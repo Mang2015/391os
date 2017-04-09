@@ -337,9 +337,8 @@ uint32_t dopen(){
  * side effects: none
  * function: directory read function
  */
-uint32_t dread(const int8_t* fname, int8_t* buf, int32_t nbytes){
-
-    return -1;
+uint32_t dread(const int8_t* fname, int8_t* buf){
+    return read_dentry_by_name(fname,buf);
 }
 /* void dwrite
  * inputs: const int8_t* fname - name of directory
