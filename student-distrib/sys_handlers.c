@@ -78,6 +78,28 @@ int32_t halt(uint8_t status){
  * SIDE EFFECTS: none
  */
 int32_t execute(const uint8_t* command){
+    int8_t cmd[128];
+    int8_t exe[4];
+    dentry_t d;
+    int32_t i = 0;
+    int32_t length = 0;
+    while((int8_t)command[i] != ' ' || (int8_t)command[i] != '\0'){
+        cmd[i] = command[i];
+        i++;
+    }
+    cmd[i] = '\0';
+    if(dread(cmd,&d) == -1 || d.ftype != 2)
+        return -1;
+    fread(d.inode_num,0,exe,4);
+    //check if executable
+    if(exe[0] != 0x7F || exe[1] != 0x45 || exe[2] != 0x4C || exe[3] != 0x46)
+        return -1;
+    //getargs
+    getargs(command+i,length);
+    //new paging
+    //load file
+    //pcb stuff
+    //context switch -> iret
     return 0;
 }
 

@@ -2,6 +2,7 @@
 #define SYS_HANDLERS
 
 #include "lib.h"
+#include "fs.h"
 
 #define SYS_HALT    1
 #define SYS_EXECUTE 2
