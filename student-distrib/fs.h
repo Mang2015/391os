@@ -45,15 +45,19 @@ void fs_init(uint8_t* fs_img);
 void print_all_files();
 void read_file_by_name(int8_t* name);
 void read_file_by_index();
+uint32_t get_length(uint32_t inode);
 
 uint32_t fopen(const int8_t* fname);
 uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes);
 uint32_t fwrite(uint32_t inode, const int8_t* buf, int32_t nbytes);
 uint32_t fclose();
+uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes);
+
 
 uint32_t dopen();
 uint32_t dread(const int8_t* fname, int8_t* buf);
 uint32_t dwrite(const int8_t* buf, int32_t nbytes);
 uint32_t dclose();
+uint32_t d_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes);
 
 #endif

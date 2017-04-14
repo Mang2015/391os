@@ -13,7 +13,9 @@
 
 #define RW 0x02
 #define RWON 0x03
+#define URWON 0x07
 #define SRWON 0x83
+#define SURWON 0x87
 
 uint32_t page_directory[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
 uint32_t page_table[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));

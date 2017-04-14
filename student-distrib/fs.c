@@ -362,3 +362,8 @@ uint32_t dclose(){
 
     return 0;
 }
+
+
+uint32_t get_length(uint32_t inode){
+    return inodes[inode].len;
+}
