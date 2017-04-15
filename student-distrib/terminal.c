@@ -53,7 +53,7 @@ int32_t terminal_read(){
     return -1;
 }
 
-int32_t terminal_driver(uint32_t cmd, int8_t* buf, uint32_t nbytes){
+int32_t terminal_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     if(cmd == 0){
         return terminal_open();
     }

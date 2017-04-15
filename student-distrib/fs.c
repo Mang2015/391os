@@ -378,7 +378,7 @@ uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
     else if(cmd == 1){
         uint32_t inode = pcb->file_arr[fd].inode;
         uint32_t offset = pcb->file_arr[fd].position;
-        return fread(inode,offset,buf,nbytes);
+        return fread(inode,offset,(int8_t*)buf,nbytes);
     }
     //write
     else if(cmd == 2){

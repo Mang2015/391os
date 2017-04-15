@@ -61,7 +61,7 @@ void rtc_handler() {
                  output - return 0
  * SIDE EFFECTS: Sets frequency to 2Hz
  */
-int32_t open_rtc(const uint8_t* filename)
+int32_t open_rtc()
 {
     // Set frequency to 2Hz
     set_freq(HZ2);
@@ -79,7 +79,7 @@ int32_t open_rtc(const uint8_t* filename)
                  outputs - return 0
  * SIDE EFFECTS: Sets interrupt flag
  */
-int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes)
+int32_t read_rtc()
 {
     // Wait for interrupts to be finished
     while(!int_flag)
@@ -104,21 +104,20 @@ int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes)
                            return number of bytes if write is successful
  * SIDE EFFECTS: Sets frequency
  */
-int32_t write_rtc(int32_t fd, const int32_t* buf, int32_t nbytes)
+int32_t write_rtc(const int32_t* buf)
 {
     int32_t write_freq;
 
     // If number of bytes is not 4 or buffer is null, return -1
-    if(nbytes != BYTE4 || buf == NULL)
+    if(buf == NULL)
         return -1;
-    else
-        write_freq = *(buf);
+
+    write_freq = *(buf);
 
     // Set the frequency
     set_freq(write_freq);
 
-    // Return the number of bytes written
-    return nbytes;
+    return 0;
 }
 
 /* close_rtc
@@ -129,13 +128,30 @@ int32_t write_rtc(int32_t fd, const int32_t* buf, int32_t nbytes)
                  output - return 0
  * SIDE EFFECTS: None
  */
-int32_t close_rtc(int32_t fd)
+int32_t close_rtc()
 {
     // Set frequency to 2Hz
     set_freq(HZ2);
 
     return 0;
 }
+
+int32_t rtc_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
+    if(cmd == 0){
+        return open_rtc();
+    }
+    else if(cmd == 1){
+        return read_rtc();
+    }
+    else if(cmd == 2){
+        return write_rtc((const int32_t*)buf);
+    }
+    else if(cmd == 3){
+        return close_rtc();
+    }
+    return -1;
+}
+
 
 /* set_freq
  *

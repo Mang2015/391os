@@ -43,10 +43,13 @@ extern void rtc_handler();
 
 uint8_t int_flag;
 
-int32_t open_rtc(const uint8_t* filename);
-int32_t read_rtc(int32_t fd, void* buf, int32_t nbytes);
-int32_t write_rtc(int32_t fd, const int32_t* buf, int32_t nbytes);
-int32_t close_rtc(int32_t fd);
+int32_t open_rtc();
+int32_t read_rtc();
+int32_t write_rtc(const int32_t* buf);
+int32_t close_rtc();
+
+
+int32_t rtc_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
 void set_freq(int32_t freq);
 
 

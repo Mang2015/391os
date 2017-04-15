@@ -358,12 +358,12 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     return i;
 }
 
-int32_t keyboard_driver(uint32_t cmd, int8_t* buf, uint32_t byte_count){
+int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count){
     if(cmd == 0){
         return keyboard_open();
     }
     else if(cmd == 1){
-        return keyboard_read(buf,byte_count);
+        return keyboard_read((int8_t*)buf,byte_count);
     }
     else if(cmd == 2){
         return keyboard_write();
