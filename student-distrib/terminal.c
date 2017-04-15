@@ -50,7 +50,7 @@ int32_t terminal_write(const char* buf, int32_t nbytes){
  * function: takes the keyboard buffer and copies whatever is in it to a different
  *            buffer passed in by the function
  */
-int32_t terminal_read(void* buf, int byte_count){
+int32_t terminal_read(char* buf, int byte_count){
     int totalBufNum = get_buf_idx();
     int i;
     for(i=0;i<=totalBufNum;i++){
@@ -58,4 +58,20 @@ int32_t terminal_read(void* buf, int byte_count){
     }
 
     return i;
+}
+
+int32_t terminal_driver(uint32_t cmd, int8_t* buf, int32_t nbytes){
+    if(cmd == 0){
+        return terminal_open();
+    }
+    else if(cmd == 1){
+        return terminal_read(buf,nbytes);
+    }
+    else if(cmd == 2){
+        return terminal_write((const int8_t*)buf, nbytes);
+    }
+    else if(cmd == 3){
+        return terminal_close();
+    }
+    return -1;
 }

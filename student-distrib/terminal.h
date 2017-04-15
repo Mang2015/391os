@@ -10,5 +10,6 @@ int32_t terminal_open();
 int32_t terminal_close();
 int32_t terminal_write(const char* buf, int32_t nbytes);
 int32_t terminal_read(void* buf, int byte_count);
+int32_t terminal_driver(uint32_t cmd, int8_t* buf, int32_t nbytes);
 
 #endif
