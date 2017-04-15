@@ -26,7 +26,7 @@ int32_t terminal_close(){
  * side effects: prints to screen
  * function: takes the buffer inputted and outputs it to the terminal screen
  */
-int32_t terminal_write(const char* buf, int32_t nbytes){
+int32_t terminal_write(const char* buf, uint32_t nbytes){
     int i;
     int bytes_written = 0;
 
@@ -44,28 +44,21 @@ int32_t terminal_write(const char* buf, int32_t nbytes){
 }
 
 /* terminal_read
- * input: the buffer to write to, bytes to write
- * output: the total number of bytes written
- * side effects: writes to a buffer whatever is in the keyboard buffer
- * function: takes the keyboard buffer and copies whatever is in it to a different
- *            buffer passed in by the function
+ * input: NONE
+ * output: -1
+ * side effects: NONE
+ * function: Doesn't do anything
  */
-int32_t terminal_read(char* buf, int byte_count){
-    int totalBufNum = get_buf_idx();
-    int i;
-    for(i=0;i<=totalBufNum;i++){
-      buf[i] = line_char_buffer[i];
-    }
-
-    return i;
+int32_t terminal_read(){
+    return -1;
 }
 
-int32_t terminal_driver(uint32_t cmd, int8_t* buf, int32_t nbytes){
+int32_t terminal_driver(uint32_t cmd, int8_t* buf, uint32_t nbytes){
     if(cmd == 0){
         return terminal_open();
     }
     else if(cmd == 1){
-        return terminal_read(buf,nbytes);
+        return terminal_read();
     }
     else if(cmd == 2){
         return terminal_write((const int8_t*)buf, nbytes);

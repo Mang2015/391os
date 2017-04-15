@@ -326,3 +326,50 @@ void clearScreen() {
 int get_buf_idx(){
     return buffIdx;
 }
+
+int32_t keybaord_open(){
+    return 0;
+};
+
+int32_t keyboard_close(){
+    return 0;
+}
+
+int32_t keyboard_write(){
+    return -1;
+}
+
+/* keyboard_read
+ * input: the buffer to write to, bytes to write
+ * output: the total number of bytes written
+ * side effects: writes to a buffer whatever is in the keyboard buffer
+ * function: takes the keyboard buffer and copies whatever is in it to a different
+ *            buffer passed in by the function
+ */
+int32_t keyboard_read(char* buf, uint32_t byte_count){
+    int totalBufNum = buffIdx;
+    if(byte_count < totalBufNum)
+        totalBufNum = byte_count;
+    int i;
+    for(i=0;i<=totalBufNum;i++){
+      buf[i] = line_char_buffer[i];
+    }
+
+    return i;
+}
+
+int32_t keyboard_driver(uint32_t cmd, int8_t* buf, uint32_t byte_count){
+    if(cmd == 0){
+        return keyboard_open();
+    }
+    else if(cmd == 1){
+        return keyboard_read(buf,byte_count);
+    }
+    else if(cmd == 2){
+        return keyboard_write();
+    }
+    else if(cmd == 3){
+        return keyboard_close();
+    }
+    return -1;
+}
