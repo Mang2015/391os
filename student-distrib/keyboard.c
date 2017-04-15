@@ -327,7 +327,7 @@ int get_buf_idx(){
     return buffIdx;
 }
 
-int32_t keybaord_open(){
+int32_t keyboard_open(){
     return 0;
 };
 

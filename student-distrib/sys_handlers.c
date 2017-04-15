@@ -80,6 +80,7 @@ int32_t halt(uint8_t status){
  * SIDE EFFECTS: none
  */
 int32_t execute(const uint8_t* command){
+
     if(num_processes == 2)
         return -1;
     num_processes++;
@@ -93,7 +94,9 @@ int32_t execute(const uint8_t* command){
     int32_t i = 0;
     int32_t length = 0;
 
-    //PARSE ARGUMENT
+    /*--------------
+    PARSE ARGUMENT
+    ----------------*/
     while((int8_t)command[i] != ' ' || (int8_t)command[i] != '\0'){
         cmd[i] = command[i];
         i++;
@@ -105,28 +108,45 @@ int32_t execute(const uint8_t* command){
         num_processes--;
         return -1;
     }
-    if(fread(d.inode_num,0,exe,4) != 0){
+    if(fread(d.inode_num,0,exe,4) != 4){
         num_processes--;
         return -1;
     }
 
-    //CHECK FILE VALIDITY
+
+    /*--------------
+    CHECK FILE VALIDITY
+    ----------------*/
     if(exe[0] != 0x7F || exe[1] != 0x45 || exe[2] != 0x4C || exe[3] != 0x46){
         num_processes--;
         return -1;
     }
 
+    //get entry point to user level program from bytes 24-27 of executable file
+    fread(d.inode_num,24,entry,4);
+    //uint32_t eip_val = 0;
+    uint32_t eip_val = *((uint32_t*)entry);
+    /*
+    eip_val = eip_val | entry[0];
+    eip_val = eip_val | (entry[1] << 8);
+    eip_val = eip_val | (entry[2] << 16);
+    eip_val = eip_val | (entry[3] << 24);
+    */
 
     //getargs
     //getargs(command+i,length);
 
-    //SETUP PAGING
+    /*--------------
+    SETUP PAGING
+    ----------------*/
     if(num_processes == 1)
         page_directory[32] = 0x800000 | SURWON;//8MB
     else
         page_directory[32] = 0xC00000 | SURWON;//12MB
 
-    //LOAD FILE INTO MEMORY
+    /*-------------------
+    LOAD FILE INTO MEMORY
+    ---------------------*/
     int8_t *prog_ptr = 0x08048000;
     length = get_length(d.inode_num);
     if(fread(d.inode_num,0,prog,length) != length){
@@ -135,42 +155,55 @@ int32_t execute(const uint8_t* command){
     }
 
     //load in program instructions into address space
+    /*
     for(i = 0; i < length; i++){
         prog_ptr[i] = prog[i];
     }
+    */
+    memcpy(prog_ptr,prog,length);
 
+    /*-------------
+    CREATE NEW PCB
+    ---------------*/
 
-    //CREATE NEW PCB
     //fill in a new task stack to bottom of kernel page
     task_stack_t *process = 0x800000 - 0x2000 * (num_processes - 1);
 
     //fill in child pcb
-    if(num_processes != 1)
-        process-->proc.parent_pcb = 0x800000 - 0x2000 * (num_processes - 2);
+    if(num_processes != 1){
+        process->proc.parent_pcb = 0x800000 - 0x2000 * (num_processes - 2);
+        process->proc.parent_proc_id = num_processes-1;
+        process->proc.parent_esp = tss.esp0;
+        process->proc.parent_ss = tss.ss0;
+    }
+    process->proc.proc_id = num_processes;
 
-    process-->proc.parent_proc_id = num_processes-1;
-    process-->proc.proc_id = num_processes;
-    process-->proc.parent_esp = tss.esp0;
-    process-->proc.parent_ss = tss.ss0;
+    /*-----------------
+    OPEN RELEVANT FD'S
+    -------------------*/
+    //open stdin
+    process->proc.file_arr[0].flags = 1;
+    process->proc.file_arr[0].table = keyboard_driver;
 
-    //SETUP FILE DESCRIPTOR STUFF
+    //open stdout
+    process->proc.file_arr[1].flags = 1;
+    process->proc.file_arr[1].table = terminal_driver;
 
-    //PUSH IRET CONTEXT TO STACK
-    fread(d.inode_num,24,entry,4);
-    uint32_t eip_val = 0;
-    eip_val = eip_val | entry[0];
-    eip_val = eip_val | (entry[1] << 8);
-    eip_val = eip_val | (entry[2] << 16);
-    eip_val = eip_val | (entry[3] << 24);
+    //initialize "in use" flags to 0
+    int j;
+    for(j=2; j<8; j++)
+        process->proc.file_arr[i].flags = 0;
 
 
+    /*--------------------------
+    PUSH IRET CONTEXT TO STACK
+    AND CALL IRET
+    ----------------------------*/
     asm volatile(
 
         "movw $0x23, %%cs \n \
         movw $0x2B, %%ss \n \
         movw $0x23, %%ds \n \
-
-
 
         pushl $0 \n \
         pushw $cs \n \
@@ -197,6 +230,7 @@ int32_t execute(const uint8_t* command){
  * SIDE EFFECTS: none
  */
 int32_t read(int32_t fd, void* buf, int32_t nbytes){
+
     return 0;
 }
 
@@ -219,6 +253,13 @@ int32_t write(int32_t fd, const void* buf, int32_t nbytes){
  * SIDE EFFECTS: none
  */
 int32_t open(const uint8_t* filename){
+    int32_t i;
+    dentry_t d;
+    if(dread(filename,d) == -1)
+        return -1;
+    for(i = 2; i < 8; i++){
+        if()
+    }
     return 0;
 }
 
