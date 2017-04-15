@@ -337,8 +337,13 @@ uint32_t dopen(){
  * side effects: none
  * function: directory read function
  */
-uint32_t dread(const int8_t* fname, int8_t* buf){
+uint32_t dread(const int8_t* fname, dentry_t* buf){
     return read_dentry_by_name(fname,buf);
+}
+
+
+uint32_t dread_idx(int32_t idx, dentry_t* buf){
+    return read_dentry_by_index(idx,buf);
 }
 /* void dwrite
  * inputs: const int8_t* fname - name of directory
@@ -348,7 +353,7 @@ uint32_t dread(const int8_t* fname, int8_t* buf){
  * side effects: none
  * function: directory write function
  */
-uint32_t dwrite(const int8_t* buf, int32_t nbytes){
+uint32_t dwrite(const dentry_t* buf){
 
     return -1;
 }
@@ -376,15 +381,15 @@ uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
     }
     //read
     else if(cmd == 1){
-        uint32_t inode = pcb->file_arr[fd].inode;
-        uint32_t offset = pcb->file_arr[fd].position;
+        uint32_t inode = curr_pcb->file_arr[fd].inode;
+        uint32_t offset = curr_pcb->file_arr[fd].position;
         return fread(inode,offset,(int8_t*)buf,nbytes);
     }
     //write
     else if(cmd == 2){
         //need to find access pcb
-        uint32_t inode = pcb->file_arr[fd].inode;
-        uint32_t offset = pcb->file_arr[fd].position;
+        uint32_t inode = curr_pcb->file_arr[fd].inode;
+        uint32_t offset = curr_pcb->file_arr[fd].position;
         return fwrite(inode,offset,(const int8_t*)buf,nbytes);
     }
     //close
@@ -392,4 +397,19 @@ uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
         return fclose();
     }
     return -1;
+}
+
+uint32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes){
+    if(cmd == 0){
+        return dopen();
+    }
+    else if(cmd == 1){
+        return dread_idx(nbytes,(dentry_t*)buf);
+    }
+    else if(cmd == 2){
+        return dwrite((const int8_t*)buf);
+    }
+    else if(cmd == 3){
+        return dclose();
+    }
 }

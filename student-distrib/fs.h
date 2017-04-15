@@ -55,9 +55,10 @@ uint32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
 
 
 uint32_t dopen();
-uint32_t dread(const int8_t* fname, int8_t* buf);
-uint32_t dwrite(const int8_t* buf, int32_t nbytes);
+uint32_t dread(const int8_t* fname, dentry_t* buf);
+uint32_t dread_idx(int32_t idx, dentry_t* buf);
+uint32_t dwrite(const int8_t* buf);
 uint32_t dclose();
-uint32_t d_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes);
+uint32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
 
 #endif
