@@ -49,7 +49,7 @@ uint32_t get_length(uint32_t inode);
 
 uint32_t fopen(const int8_t* fname);
 uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes);
-uint32_t fwrite(uint32_t inode, const int8_t* buf, int32_t nbytes);
+uint32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes);
 uint32_t fclose();
 uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes);
 

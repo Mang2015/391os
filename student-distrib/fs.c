@@ -305,7 +305,7 @@ uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
  * side effects: writes to file
  * function: file write function
  */
-uint32_t fwrite(uint32_t inode, const int8_t* buf, int32_t nbytes){
+uint32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes){
 
     return -1;
 }
@@ -366,4 +366,30 @@ uint32_t dclose(){
 
 uint32_t get_length(uint32_t inode){
     return inodes[inode].len;
+}
+
+
+uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
+    //open
+    if(cmd == 0){
+        return fopen((const int8_t*)buf);
+    }
+    //read
+    else if(cmd == 1){
+        uint32_t inode = pcb->file_arr[fd].inode;
+        uint32_t offset = pcb->file_arr[fd].position;
+        return fread(inode,offset,buf,nbytes);
+    }
+    //write
+    else if(cmd == 2){
+        //need to find access pcb
+        uint32_t inode = pcb->file_arr[fd].inode;
+        uint32_t offset = pcb->file_arr[fd].position;
+        return fwrite(inode,offset,(const int8_t*)buf,nbytes);
+    }
+    //close
+    else if(cmd == 3){
+        return fclose();
+    }
+    return -1;
 }
