@@ -1,4 +1,5 @@
 #include "sys_handlers.h"
+#include "x86_desc.h"
 
 static int32_t halt(uint8_t status);
 static int32_t execute(const uint8_t* command);
@@ -82,13 +83,17 @@ int32_t execute(const uint8_t* command){
     if(num_processes == 2)
         return -1;
     num_processes++;
+    //max file size
     int8_t prog[4190208];
+    //command line buffer
     int8_t cmd[128];
     int8_t exe[4];
+    int8_t entry[4];
     dentry_t d;
     int32_t i = 0;
     int32_t length = 0;
 
+    //PARSE ARGUMENT
     while((int8_t)command[i] != ' ' || (int8_t)command[i] != '\0'){
         cmd[i] = command[i];
         i++;
@@ -104,7 +109,8 @@ int32_t execute(const uint8_t* command){
         num_processes--;
         return -1;
     }
-    //check if executable
+
+    //CHECK FILE VALIDITY
     if(exe[0] != 0x7F || exe[1] != 0x45 || exe[2] != 0x4C || exe[3] != 0x46){
         num_processes--;
         return -1;
@@ -114,44 +120,71 @@ int32_t execute(const uint8_t* command){
     //getargs
     //getargs(command+i,length);
 
-    //new paging
+    //SETUP PAGING
     if(num_processes == 1)
         page_directory[32] = 0x800000 | SURWON;//8MB
     else
         page_directory[32] = 0xC00000 | SURWON;//12MB
-    //load file into memory
+
+    //LOAD FILE INTO MEMORY
     int8_t *prog_ptr = 0x08048000;
     length = get_length(d.inode_num);
     if(fread(d.inode_num,0,prog,length) != length){
         num_processes--;
         return -1;
     }
+
+    //load in program instructions into address space
     for(i = 0; i < length; i++){
         prog_ptr[i] = prog[i];
     }
 
 
-    //pcb stuff
+    //CREATE NEW PCB
     //fill in a new task stack to bottom of kernel page
     task_stack_t *process = 0x800000 - 0x2000 * (num_processes - 1);
 
     //fill in child pcb
-    if(num_processes != 1){
-        int32_t pcb_loc;
-        asm ("movl %%esp,%0":"=r"(pcb_loc));
-        pcb_loc = pcb_loc & 0xFFFFF000;
-        if(pcb_loc % 0x2000)
-            pcb_loc -= 0x1000;
+    if(num_processes != 1)
+        process-->proc.parent_pcb = 0x800000 - 0x2000 * (num_processes - 2);
 
-        process-->proc.parent_proc_id = num_processes-1;
-        process-->proc.parent_pcb = (process_control_block_t*)pcb_loc;
-    }
+    process-->proc.parent_proc_id = num_processes-1;
     process-->proc.proc_id = num_processes;
-    asm ("movl %%esp,%0":"=r"(process-->proc.esp_loc));
-    asm ("movl %%ebp,%0":"=r"(process-->proc.ebp_loc));
+    process-->proc.parent_esp = tss.esp0;
+    process-->proc.parent_ss = tss.ss0;
+
+    //SETUP FILE DESCRIPTOR STUFF
+
+    //PUSH IRET CONTEXT TO STACK
+    fread(d.inode_num,24,entry,4);
+    uint32_t eip_val = 0;
+    eip_val = eip_val | entry[0];
+    eip_val = eip_val | (entry[1] << 8);
+    eip_val = eip_val | (entry[2] << 16);
+    eip_val = eip_val | (entry[3] << 24);
 
 
-    //context switch -> iret
+    asm volatile(
+
+        "movw $0x23, %%cs \n \
+        movw $0x2B, %%ss \n \
+        movw $0x23, %%ds \n \
+
+
+
+        pushl $0 \n \
+        pushw $cs \n \
+        pushl %%eflags \n \
+        pushl %%esp \n \
+        pushw %%ss \n \
+        movw %%esp,$0"
+        :"=r"(tss.esp0)
+        :"r"(eip_val)
+    );
+
+    //IRET
+    asm ("iret");
+
     return 0;
 }
 

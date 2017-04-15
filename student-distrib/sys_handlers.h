@@ -32,13 +32,14 @@ typdef struct pcb{
     int32_t parent_proc_id;//4
     file_descriptor_structure_t file_arr[8];//128
     process_control_block_t* parent_pcb;//4
-    int32_t esp_loc;//4
-    int32_t ebp_loc;//4
+    int32_t parent_esp;//4
+    int16_t parent_ss;//2
+    int16_t reserved;//2
 }process_control_block_t;//148
 
 typedef struct task_stack{//8kb
     //pcb
-    process_control_block_t proc;//144
+    process_control_block_t proc;//146
     int8_t stack[8192-148];
 }task_stack_t;
 #endif

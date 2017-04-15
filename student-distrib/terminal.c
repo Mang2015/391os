@@ -51,12 +51,11 @@ int32_t terminal_write(const char* buf, int32_t nbytes){
  *            buffer passed in by the function
  */
 int32_t terminal_read(void* buf, int byte_count){
-    /*int totalBufNum = get_buf_idx();
+    int totalBufNum = get_buf_idx();
     int i;
     for(i=0;i<=totalBufNum;i++){
-      line_char_buffer[i] = buf[i];
+      buf[i] = line_char_buffer[i];
     }
 
-    return i;*/
-    return -1;
+    return i;
 }
