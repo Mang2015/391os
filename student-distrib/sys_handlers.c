@@ -69,6 +69,57 @@ int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t ar
  * SIDE EFFECTS: none
  */
 int32_t halt(uint8_t status){
+
+    uint32_t i;
+
+    if (num_processes == 1)
+    {
+        // restart shell
+        execute((uint8_t*)"shell");         // need to recheck this but I think it's fine
+    }
+
+    cli();
+
+    // need to access current process pcb to get values for parent process
+    task_stack_t *curr_process = 0x800000 - 0x2000 * (num_processes - 1);
+    process_control_block_t curr_block = curr_process->proc;
+
+    //update tss esp and ss (reloading parent data)
+    tss.esp0 = curr_block.parent_esp;
+    tss.ss0 = curr_block.parent_ss;
+
+    //back to parent process
+    num_processes--;
+
+    //restore parent paging
+    if(num_processes == 1)
+        page_directory[32] = 0x800000 | SURWON;//8MB
+    else
+        page_directory[32] = 0xC00000 | SURWON;//12MB
+
+    //flush tlb
+    asm volatile(
+        "movl %%cr3,%%eax \n \
+        movl %%eax,%%cr3"
+    );
+
+    // change all fd flags to 0
+    for (i = 2; i < 8; i++) {
+        if (curr_block.file_arr[i].flags == 1) {
+            close(curr_block.file_arr[i]);
+        }
+    }
+
+    sti();
+
+    // jump to execute return
+    asm volatile(
+        "movzwl %%bl, %%eax \n \
+         jmp EXEC_RET"
+        :
+        :"r" (status)
+    );
+
     return 0;
 }
 
@@ -223,6 +274,10 @@ int32_t execute(const uint8_t* command){
 // compiler errors for lines 203-205
     //IRET
     asm ("iret");
+
+    asm volatile(
+        "EXEC_RET:"
+    );
 
     return 0;
 }
