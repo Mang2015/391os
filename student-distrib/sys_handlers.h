@@ -29,7 +29,7 @@ int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t ar
 
 
 typedef struct file_descriptor_structure{
-    int32_t* table;
+    int32_t (*table)(uint32_t,uint32_t,void*,uint32_t);
     int32_t inode;
     int32_t position;
     int32_t flags;

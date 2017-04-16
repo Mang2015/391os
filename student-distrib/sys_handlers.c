@@ -182,11 +182,11 @@ int32_t execute(const uint8_t* command){
     -------------------*/
     //open stdin
     process->proc.file_arr[0].flags = 1;
-    process->proc.file_arr[0].table = (int32_t*)keyboard_driver;
+    process->proc.file_arr[0].table = keyboard_driver;
 
     //open stdout
     process->proc.file_arr[1].flags = 1;
-    process->proc.file_arr[1].table = (int32_t*)terminal_driver;
+    process->proc.file_arr[1].table = terminal_driver;
 
     //initialize "in use" flags to 0
     int j;
@@ -204,8 +204,8 @@ int32_t execute(const uint8_t* command){
         movw $0x2B, %%ss \n \
         movw $0x23, %%ds \n \
         pushl $0 \n \
-        pushw $cs \n \
-        pushl %%eflags \n \
+        pushw %%cs \n \
+        pushf \n \
         pushl %%esp \n \
         pushw %%ss \n \
         movw %%esp,$0"
@@ -230,9 +230,7 @@ int32_t execute(const uint8_t* command){
 int32_t read(int32_t fd, void* buf, int32_t nbytes){
     if(fd < 0 || fd > 7 || curr_pcb->file_arr[fd].flags == 0)
         return -1;
-    int32_t (*read_func)(uint32_t,uint32_t,void*,uint32_t);
-    read_func = curr_pcb->file_arr[fd].table;
-    int32_t bytes_read = read_func(READ,fd,buf,nbytes);
+    int32_t bytes_read = curr_pcb->file_arr[fd].table(READ,fd,buf,nbytes);
     if(bytes_read == -1)
         return -1;
 
@@ -251,7 +249,7 @@ int32_t read(int32_t fd, void* buf, int32_t nbytes){
 int32_t write(int32_t fd, const void* buf, int32_t nbytes){
     if(fd < 0 || fd > 7 || curr_pcb->file_arr[fd].flags == 0)
         return -1;
-    int32_t bytes_written = curr_pcb->file_arr[fd].table(WRITE,fd,buf,nbytes);
+    int32_t bytes_written = curr_pcb->file_arr[fd].table(WRITE,fd,(void*)buf,nbytes);
     return bytes_written;
 }
 
@@ -273,15 +271,15 @@ int32_t open(const uint8_t* filename){
             curr_pcb->file_arr[i].position = 0;
             //file is rtc
             if(d.ftype == 0)
-                curr_pcb->file_arr[i].table = (int32_t*)rtc_driver;
+                curr_pcb->file_arr[i].table = rtc_driver;
             //file is directory
             else if(d.ftype == 1){
                 curr_pcb->file_arr[i].position = get_idx(d.inode_num);
-                curr_pcb->file_arr[i].table = (int32_t*)d_driver;
+                curr_pcb->file_arr[i].table = d_driver;
             }
             //file is file
             else if(d.ftype == 2)
-                curr_pcb->file_arr[i].table = (int32_t*)f_driver;
+                curr_pcb->file_arr[i].table = f_driver;
 
             break;
         }
