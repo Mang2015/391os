@@ -81,7 +81,7 @@ int32_t halt(uint8_t status){
     //cli();
 
     // need to access current process pcb to get values for parent process
-    task_stack_t *curr_process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes - 1));
+    task_stack_t *curr_process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes));
     process_control_block_t curr_block = curr_process->proc;
 
     //reset pcb pointer
@@ -139,7 +139,7 @@ int32_t execute(const uint8_t* command){
         return -1;
     num_processes++;
     //max file size
-    int8_t prog[4190208];
+    //int8_t prog[4190208];
     //command line buffer
     int8_t cmd[128];
     int8_t exe[4];
@@ -151,7 +151,7 @@ int32_t execute(const uint8_t* command){
     /*--------------
     PARSE ARGUMENT
     ----------------*/
-    while((int8_t)command[i] != ' ' || (int8_t)command[i] != '\0'){
+    while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0')){
         cmd[i] = command[i];
         i++;
     }
@@ -206,9 +206,9 @@ int32_t execute(const uint8_t* command){
     /*-------------------
     LOAD FILE INTO MEMORY
     ---------------------*/
-    int8_t *prog_ptr = (int8_t*)0x08048000;
     length = get_length(d.inode_num);
-    if(fread(d.inode_num,0,prog,length) != length){
+    int8_t *prog_ptr = (int8_t*)0x08048000;
+    if(fread(d.inode_num,0,prog_ptr,length) != length){
         num_processes--;
         return -1;
     }
@@ -219,18 +219,18 @@ int32_t execute(const uint8_t* command){
         prog_ptr[i] = prog[i];
     }
     */
-    memcpy(prog_ptr,prog,length);
+    //memcpy(prog_ptr,prog,length);
 
     /*-------------
     CREATE NEW PCB
     ---------------*/
 
     //fill in a new task stack to bottom of kernel page
-    task_stack_t *process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes - 1));
+    task_stack_t *process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes));
 
     //fill in child pcb
     if(num_processes != 1){
-        process->proc.parent_pcb = (process_control_block_t*)(0x800000 - 0x2000 * (num_processes - 2));
+        process->proc.parent_pcb = (process_control_block_t*)(0x800000 - 0x2000 * (num_processes - 1));
         process->proc.parent_proc_id = num_processes-1;
         process->proc.parent_esp0 = tss.esp0;
         process->proc.parent_ss0 = tss.ss0;
@@ -270,15 +270,19 @@ int32_t execute(const uint8_t* command){
     ----------------------------*/
 
     asm volatile(
-          "movl $0x2B, %%eax   \n \
-          movw %%ax, %%ds \n \
-          pushl %%eax \n \
+          "movl $0x2B, %eax   \n \
+          movw %ax, %ds \n \
+          pushl %eax \n \
           pushl $0x83FFFFF \n \
           pushfl \n \
-          pushl $0x23 \n \
-          pushl %0"
-          :
-          :"r"(eip_val)
+          pushl $0x23"
+    );
+
+    asm volatile(
+        "movl %0, %%ecx \n \
+        pushl %%ecx"
+        :
+        :"r"(eip_val)
     );
 
     //IRET

@@ -163,7 +163,7 @@ int32_t read_data(uint32_t inode, uint32_t offset, uint8_t* buf, uint32_t length
 
     counter = 0;
     //keep filling in until buffer is filled with length chars
-    while(counter != length || counter+offset < len){
+    while(counter != length && counter+offset < len){
         buf[counter] = data_blocks[db_num].data[start];
         //if reach the end of the block, go to next block
         if(start == BLOCK_SIZE - 1){
@@ -295,7 +295,8 @@ int32_t fopen(const int8_t* fname){
  * function: file read function
  */
 int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, uint32_t nbytes){
-    return read_data(inode,offset,(uint8_t*)buf,nbytes);
+    int32_t retval = read_data(inode,offset,(uint8_t*)buf,nbytes);
+    return retval;
 }
 /* void fwrite
  * inputs: uint32_t inode - inode number

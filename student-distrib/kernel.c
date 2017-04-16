@@ -174,10 +174,9 @@ entry (unsigned long magic, unsigned long addr)
 	printf("Enabling Interrupts\n");
 	sti();
 //  print_all_files();
-//	read_file_by_name("frame0.txt");
+//	read_file_by_name("shell");
 //	read_file_by_index();
 //  test_rtc();
-	//execute("shell");
 	int8_t* cmd = "shell";
 	system_handler(SYS_EXECUTE,(uint32_t)cmd,0,0);
 	/* Execute the first program (`shell') ... */
