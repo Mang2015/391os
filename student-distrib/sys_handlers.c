@@ -196,7 +196,7 @@ int32_t execute(const uint8_t* command){
     //initialize "in use" flags to 0
     int j;
     for(j=2; j<8; j++)
-        process->proc.file_arr[i].flags = 0;
+        process->proc.file_arr[j].flags = 0;
 
     curr_pcb = &(process->proc);
 
