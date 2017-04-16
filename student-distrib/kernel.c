@@ -10,6 +10,7 @@
 #include "idt.h"
 #include "paging.h"
 #include "fs.h"
+#include "sys_handlers.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -176,7 +177,9 @@ entry (unsigned long magic, unsigned long addr)
 //	read_file_by_name("frame0.txt");
 //	read_file_by_index();
 //  test_rtc();
-
+	//execute("shell");
+	int8_t* cmd = "shell";
+	system_handler(SYS_EXECUTE,(uint32_t)cmd,0,0);
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");
