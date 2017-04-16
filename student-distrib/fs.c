@@ -342,8 +342,13 @@ int32_t dread(const int8_t* fname, dentry_t* buf){
 }
 
 
-int32_t dread_idx(int32_t idx, dentry_t* buf){
-    return read_dentry_by_index(idx,buf);
+int32_t dread_idx(int32_t idx, int8_t* buf){
+    if(idx >= boot_block->num_dir_entries)
+        return 0;
+    dentry_t d;
+    read_dentry_by_index(idx,d);
+    strncpy(buf,d.fname,FNAME_LEN);
+    return 1;
 }
 /* void dwrite
  * inputs: const int8_t* fname - name of directory
@@ -413,7 +418,8 @@ int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes){
         return dopen();
     }
     else if(cmd == READ){
-        return dread_idx(nbytes,(dentry_t*)buf);
+        uint32_t idx = curr_pcb->file_arr[fd].position;
+        return dread_idx(idx,(int8_t*)buf);
     }
     else if(cmd == WRITE){
         return dwrite((const int8_t*)buf);

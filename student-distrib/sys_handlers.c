@@ -230,8 +230,15 @@ int32_t execute(const uint8_t* command){
  * SIDE EFFECTS: none
  */
 int32_t read(int32_t fd, void* buf, int32_t nbytes){
+    if(fd < 0 || fd > 7 || curr_pcb->file_arr[fd].flags == 0)
+        return -1;
 
-    return 0;
+    int32_t bytes_read = curr_pcb->file_arr[fd].table(READ,fd,buf,nbytes);
+    if(bytes_read == -1)
+        return -1;
+
+    curr_pcb->file_arr[fd].position += bytes_read;
+    return bytes_read;
 }
 
 /* write
@@ -243,7 +250,10 @@ int32_t read(int32_t fd, void* buf, int32_t nbytes){
  * SIDE EFFECTS: none
  */
 int32_t write(int32_t fd, const void* buf, int32_t nbytes){
-    return 0;
+    if(fd < 0 || fd > 7 || curr_pcb->file_arr[fd].flags == 0)
+        return -1;
+    int32_t bytes_written = curr_pcb->file_arr[fd].table(WRITE,fd,buf,nbytes);
+    return bytes_written;
 }
 
 /* open
@@ -293,12 +303,12 @@ int32_t open(const uint8_t* filename){
  */
 int32_t close(int32_t fd){
     //invalid fd
-    if(fd < 2 || fd > 7)
+    if(fd < 2 || fd > 7 || curr_pcb->file_arr[fd].flags == 0)
         return -1;
     //call specific close
-    curr_pcb->file_arr[i].table(CLOSE,fd,NULL,-1);
+    curr_pcb->file_arr[fd].table(CLOSE,fd,NULL,-1);
     //mark as empty
-    curr_pcb->file_arr[i].flags = 0;
+    curr_pcb->file_arr[fd].flags = 0;
 
     return 0;
 }
