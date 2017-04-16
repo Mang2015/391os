@@ -13,6 +13,7 @@
 #define RTC 0x28
 #define KEYBOARD 0x21
 #define NUM_SYS_HANDLERS 20
+#define RESERVED 15
 
 #define RING0 0
 #define RING1 1

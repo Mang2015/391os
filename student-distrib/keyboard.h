@@ -45,7 +45,7 @@ extern int get_buf_idx();
 
 int32_t keyboard_open();
 int32_t keyboard_close();
-int32_t keyboard_read(uint8_t* buf, uint32_t byte_count);
+int32_t keyboard_read(int8_t* buf, uint32_t byte_count);
 int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count);
 
 volatile extern uint8_t line_char_buffer[128];

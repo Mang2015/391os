@@ -236,7 +236,7 @@ void test_rtc(){
     // Test each frequency using enter button as progression to next frequency
     for(i = 0; i < 10; i++){
         key = get_buf_idx();
-        write_rtc(0,&freq[i],4);
+        write_rtc(&freq[i]);
         while(key == get_buf_idx());
         bksp_handler();
     }

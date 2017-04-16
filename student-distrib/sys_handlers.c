@@ -146,7 +146,7 @@ int32_t execute(const uint8_t* command){
     /*-------------------
     LOAD FILE INTO MEMORY
     ---------------------*/
-    int8_t *prog_ptr = 0x08048000;
+    int8_t *prog_ptr = (int8_t*)0x08048000;
     length = get_length(d.inode_num);
     if(fread(d.inode_num,0,prog,length) != length){
         num_processes--;
@@ -166,11 +166,11 @@ int32_t execute(const uint8_t* command){
     ---------------*/
 
     //fill in a new task stack to bottom of kernel page
-    task_stack_t *process = 0x800000 - 0x2000 * (num_processes - 1);
+    task_stack_t *process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes - 1));
 
     //fill in child pcb
     if(num_processes != 1){
-        process->proc.parent_pcb = 0x800000 - 0x2000 * (num_processes - 2);
+        process->proc.parent_pcb = (process_control_block_t*)(0x800000 - 0x2000 * (num_processes - 2));
         process->proc.parent_proc_id = num_processes-1;
         process->proc.parent_esp = tss.esp0;
         process->proc.parent_ss = tss.ss0;
@@ -182,11 +182,11 @@ int32_t execute(const uint8_t* command){
     -------------------*/
     //open stdin
     process->proc.file_arr[0].flags = 1;
-    process->proc.file_arr[0].table = keyboard_driver;
+    process->proc.file_arr[0].table = (int32_t*)keyboard_driver;
 
     //open stdout
     process->proc.file_arr[1].flags = 1;
-    process->proc.file_arr[1].table = terminal_driver;
+    process->proc.file_arr[1].table = (int32_t*)terminal_driver;
 
     //initialize "in use" flags to 0
     int j;
@@ -200,11 +200,9 @@ int32_t execute(const uint8_t* command){
     AND CALL IRET
     ----------------------------*/
     asm volatile(
-
         "movw $0x23, %%cs \n \
         movw $0x2B, %%ss \n \
         movw $0x23, %%ds \n \
-
         pushl $0 \n \
         pushw $cs \n \
         pushl %%eflags \n \
@@ -232,8 +230,9 @@ int32_t execute(const uint8_t* command){
 int32_t read(int32_t fd, void* buf, int32_t nbytes){
     if(fd < 0 || fd > 7 || curr_pcb->file_arr[fd].flags == 0)
         return -1;
-
-    int32_t bytes_read = curr_pcb->file_arr[fd].table(READ,fd,buf,nbytes);
+    int32_t (*read_func)(uint32_t,uint32_t,void*,uint32_t);
+    read_func = curr_pcb->file_arr[fd].table;
+    int32_t bytes_read = read_func(READ,fd,buf,nbytes);
     if(bytes_read == -1)
         return -1;
 
@@ -265,7 +264,7 @@ int32_t write(int32_t fd, const void* buf, int32_t nbytes){
 int32_t open(const uint8_t* filename){
     int32_t i;
     dentry_t d;
-    if(dread(filename,d) == -1)
+    if(dread((const int8_t*)filename,&d) == -1)
         return -1;
     for(i = 2; i < 8; i++){
         if(curr_pcb->file_arr[i].flags == 0){
@@ -274,15 +273,15 @@ int32_t open(const uint8_t* filename){
             curr_pcb->file_arr[i].position = 0;
             //file is rtc
             if(d.ftype == 0)
-                curr_pcb->file_arr[i].table = rtc_driver;
+                curr_pcb->file_arr[i].table = (int32_t*)rtc_driver;
             //file is directory
             else if(d.ftype == 1){
                 curr_pcb->file_arr[i].position = get_idx(d.inode_num);
-                curr_pcb->file_arr[i].table = d_driver;
+                curr_pcb->file_arr[i].table = (int32_t*)d_driver;
             }
             //file is file
             else if(d.ftype == 2)
-                curr_pcb->file_arr[i].table = f_driver;
+                curr_pcb->file_arr[i].table = (int32_t*)f_driver;
 
             break;
         }

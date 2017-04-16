@@ -62,7 +62,7 @@ void init_idt(){
       idt[i].dpl = RING3;
 
     //assign correct handler
-    if(i < NUM_SYS_HANDLERS && i != 15)
+    if(i < NUM_SYS_HANDLERS && i != RESERVED)
         SET_IDT_ENTRY(idt[i],sys_handlers[i]);
     else if(i == SYS_CALL)
         SET_IDT_ENTRY(idt[i],system_handler_wrapper);

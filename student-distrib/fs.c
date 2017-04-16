@@ -294,7 +294,7 @@ int32_t fopen(const int8_t* fname){
  * side effects: fills buf
  * function: file read function
  */
-int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
+int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, uint32_t nbytes){
     return read_data(inode,offset,(uint8_t*)buf,nbytes);
 }
 /* void fwrite
@@ -305,7 +305,7 @@ int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
  * side effects: writes to file
  * function: file write function
  */
-int32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes){
+int32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, uint32_t nbytes){
 
     return -1;
 }
@@ -338,7 +338,7 @@ int32_t dopen(){
  * function: directory read function
  */
 int32_t dread(const int8_t* fname, dentry_t* buf){
-    return read_dentry_by_name(fname,buf);
+    return read_dentry_by_name((const uint8_t*)fname,buf);
 }
 
 
@@ -346,7 +346,7 @@ int32_t dread_idx(int32_t idx, int8_t* buf){
     if(idx >= boot_block->num_dir_entries)
         return 0;
     dentry_t d;
-    read_dentry_by_index(idx,d);
+    read_dentry_by_index(idx,&d);
     strncpy(buf,d.fname,FNAME_LEN);
     return 1;
 }
@@ -358,7 +358,7 @@ int32_t dread_idx(int32_t idx, int8_t* buf){
  * side effects: none
  * function: directory write function
  */
-int32_t dwrite(const dentry_t* buf){
+int32_t dwrite(const const int8_t* buf){
 
     return -1;
 }
@@ -388,7 +388,7 @@ int32_t get_idx(uint32_t inode){
 }
 
 
-int32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
+int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     //open
     if(cmd == OPEN){
         return fopen((const int8_t*)buf);
@@ -413,7 +413,7 @@ int32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
     return -1;
 }
 
-int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes){
+int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     if(cmd == OPEN){
         return dopen();
     }

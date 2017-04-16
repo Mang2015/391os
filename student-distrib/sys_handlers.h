@@ -4,6 +4,9 @@
 #include "lib.h"
 #include "fs.h"
 #include "paging.h"
+#include "rtc.h"
+#include "terminal.h"
+#include "keyboard.h"
 
 #define SYS_HALT    1
 #define SYS_EXECUTE 2
@@ -24,7 +27,6 @@
 
 int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t arg2);
 
-process_control_block_t *curr_pcb;
 
 typedef struct file_descriptor_structure{
     int32_t* table;
@@ -37,7 +39,7 @@ typedef struct pcb{
     int32_t proc_id;//4
     int32_t parent_proc_id;//4
     file_descriptor_structure_t file_arr[8];//128
-    process_control_block_t* parent_pcb;//4
+    struct pcb* parent_pcb;//4
     int32_t parent_esp;//4
     int16_t parent_ss;//2
     int16_t reserved;//2
@@ -48,4 +50,7 @@ typedef struct task_stack{//8kb
     process_control_block_t proc;//146
     int8_t stack[8192-148];
 }task_stack_t;
+
+process_control_block_t *curr_pcb;
+
 #endif

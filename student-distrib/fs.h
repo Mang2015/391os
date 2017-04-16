@@ -50,17 +50,17 @@ uint32_t get_length(uint32_t inode);
 int32_t get_idx(uint32_t inode);
 
 int32_t fopen(const int8_t* fname);
-int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes);
-int32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes);
+int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, uint32_t nbytes);
+int32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, uint32_t nbytes);
 int32_t fclose();
-int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
+int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes);
 
 
 int32_t dopen();
 int32_t dread(const int8_t* fname, dentry_t* buf);
-int32_t dread_idx(int32_t idx, dentry_t* buf);
+int32_t dread_idx(int32_t idx, int8_t* buf);
 int32_t dwrite(const int8_t* buf);
 int32_t dclose();
-int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
+int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes);
 
 #endif
