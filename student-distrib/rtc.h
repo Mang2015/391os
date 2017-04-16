@@ -5,6 +5,7 @@
 #include "types.h"
 #include "i8259.h"
 #include "keyboard.h"
+#include "sys_handlers.h"
 
 
 #define RTC_PORT  0x70

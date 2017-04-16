@@ -17,8 +17,14 @@
 #define SYS_SIGRETURN  10
 #define USER 0x08000000
 
+#define OPEN 0
+#define READ 1
+#define WRITE 2
+#define CLOSE 3
+
 int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t arg2);
 
+process_control_block_t *curr_pcb;
 
 typedef struct file_descriptor_structure{
     int32_t* table;
@@ -27,7 +33,7 @@ typedef struct file_descriptor_structure{
     int32_t flags;
 }file_descriptor_structure_t;//16
 
-typdef struct pcb{
+typedef struct pcb{
     int32_t proc_id;//4
     int32_t parent_proc_id;//4
     file_descriptor_structure_t file_arr[8];//128

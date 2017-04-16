@@ -137,16 +137,16 @@ int32_t close_rtc()
 }
 
 int32_t rtc_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
-    if(cmd == 0){
+    if(cmd == OPEN){
         return open_rtc();
     }
-    else if(cmd == 1){
+    else if(cmd == READ){
         return read_rtc();
     }
-    else if(cmd == 2){
+    else if(cmd == WRITE){
         return write_rtc((const int32_t*)buf);
     }
-    else if(cmd == 3){
+    else if(cmd == CLOSE){
         return close_rtc();
     }
     return -1;

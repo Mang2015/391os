@@ -4,6 +4,7 @@
 #include "lib.h"
 #include "terminal.h"
 #include "keyboard.h"
+#include "sys_handlers.h"
 
 #define FNAME_LEN 32
 #define RSRV_BYTES 24
@@ -46,19 +47,20 @@ void print_all_files();
 void read_file_by_name(int8_t* name);
 void read_file_by_index();
 uint32_t get_length(uint32_t inode);
+int32_t get_idx(uint32_t inode);
 
-uint32_t fopen(const int8_t* fname);
-uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes);
-uint32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes);
-uint32_t fclose();
-uint32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
+int32_t fopen(const int8_t* fname);
+int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes);
+int32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes);
+int32_t fclose();
+int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
 
 
-uint32_t dopen();
-uint32_t dread(const int8_t* fname, dentry_t* buf);
-uint32_t dread_idx(int32_t idx, dentry_t* buf);
-uint32_t dwrite(const int8_t* buf);
-uint32_t dclose();
-uint32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
+int32_t dopen();
+int32_t dread(const int8_t* fname, dentry_t* buf);
+int32_t dread_idx(int32_t idx, dentry_t* buf);
+int32_t dwrite(const int8_t* buf);
+int32_t dclose();
+int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes);
 
 #endif

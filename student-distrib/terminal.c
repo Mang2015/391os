@@ -54,16 +54,16 @@ int32_t terminal_read(){
 }
 
 int32_t terminal_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
-    if(cmd == 0){
+    if(cmd == OPEN){
         return terminal_open();
     }
-    else if(cmd == 1){
+    else if(cmd == READ){
         return terminal_read();
     }
-    else if(cmd == 2){
+    else if(cmd == WRITE){
         return terminal_write((const int8_t*)buf, nbytes);
     }
-    else if(cmd == 3){
+    else if(cmd == CLOSE){
         return terminal_close();
     }
     return -1;

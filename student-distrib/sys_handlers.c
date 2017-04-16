@@ -15,7 +15,6 @@ static int32_t sigreturn(void);
 
 static int32_t num_processes = 0;
 
-
 /* system_handler
  *
  * DESCRIPTION: INT 80 was invoked
@@ -194,6 +193,7 @@ int32_t execute(const uint8_t* command){
     for(j=2; j<8; j++)
         process->proc.file_arr[i].flags = 0;
 
+    curr_pcb = &(process->proc);
 
     /*--------------------------
     PUSH IRET CONTEXT TO STACK
@@ -258,9 +258,31 @@ int32_t open(const uint8_t* filename){
     if(dread(filename,d) == -1)
         return -1;
     for(i = 2; i < 8; i++){
-        if()
+        if(curr_pcb->file_arr[i].flags == 0){
+            curr_pcb->file_arr[i].flags = 1;
+            curr_pcb->file_arr[i].inode = d.inode_num;
+            curr_pcb->file_arr[i].position = 0;
+            //file is rtc
+            if(d.ftype == 0)
+                curr_pcb->file_arr[i].table = rtc_driver;
+            //file is directory
+            else if(d.ftype == 1){
+                curr_pcb->file_arr[i].position = get_idx(d.inode_num);
+                curr_pcb->file_arr[i].table = d_driver;
+            }
+            //file is file
+            else if(d.ftype == 2)
+                curr_pcb->file_arr[i].table = f_driver;
+
+            break;
+        }
     }
-    return 0;
+    if(i == 8)
+        return -1;
+    //call specific open
+    curr_pcb->file_arr[i].table(OPEN,i,NULL,-1);
+    //return fd
+    return i;
 }
 
 /* close
@@ -270,6 +292,14 @@ int32_t open(const uint8_t* filename){
  * SIDE EFFECTS: none
  */
 int32_t close(int32_t fd){
+    //invalid fd
+    if(fd < 2 || fd > 7)
+        return -1;
+    //call specific close
+    curr_pcb->file_arr[i].table(CLOSE,fd,NULL,-1);
+    //mark as empty
+    curr_pcb->file_arr[i].flags = 0;
+
     return 0;
 }
 

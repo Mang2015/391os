@@ -359,16 +359,16 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
 }
 
 int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count){
-    if(cmd == 0){
+    if(cmd == OPEN){
         return keyboard_open();
     }
-    else if(cmd == 1){
+    else if(cmd == READ){
         return keyboard_read((int8_t*)buf,byte_count);
     }
-    else if(cmd == 2){
+    else if(cmd == WRITE){
         return keyboard_write();
     }
-    else if(cmd == 3){
+    else if(cmd == CLOSE){
         return keyboard_close();
     }
     return -1;

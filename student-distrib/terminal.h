@@ -5,6 +5,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "keyboard.h"
+#include "sys_handlers.h"
 
 int32_t terminal_open();
 int32_t terminal_close();

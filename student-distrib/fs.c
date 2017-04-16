@@ -282,7 +282,7 @@ void read_file_by_index(){
  * side effects: none
  * function: file open function
  */
-uint32_t fopen(const int8_t* fname){
+int32_t fopen(const int8_t* fname){
 
     return 0;
 }
@@ -294,7 +294,7 @@ uint32_t fopen(const int8_t* fname){
  * side effects: fills buf
  * function: file read function
  */
-uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
+int32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
     return read_data(inode,offset,(uint8_t*)buf,nbytes);
 }
 /* void fwrite
@@ -305,7 +305,7 @@ uint32_t fread(uint32_t inode, uint32_t offset, int8_t* buf, int32_t nbytes){
  * side effects: writes to file
  * function: file write function
  */
-uint32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes){
+int32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbytes){
 
     return -1;
 }
@@ -315,7 +315,7 @@ uint32_t fwrite(uint32_t inode, uint32_t offset, const int8_t* buf, int32_t nbyt
  * side effects: none
  * function: file close function
  */
-uint32_t fclose(){
+int32_t fclose(){
     return 0;
 }
 
@@ -325,7 +325,7 @@ uint32_t fclose(){
  * side effects: none
  * function: directory open function
  */
-uint32_t dopen(){
+int32_t dopen(){
 
     return 0;
 }
@@ -337,12 +337,12 @@ uint32_t dopen(){
  * side effects: none
  * function: directory read function
  */
-uint32_t dread(const int8_t* fname, dentry_t* buf){
+int32_t dread(const int8_t* fname, dentry_t* buf){
     return read_dentry_by_name(fname,buf);
 }
 
 
-uint32_t dread_idx(int32_t idx, dentry_t* buf){
+int32_t dread_idx(int32_t idx, dentry_t* buf){
     return read_dentry_by_index(idx,buf);
 }
 /* void dwrite
@@ -353,17 +353,17 @@ uint32_t dread_idx(int32_t idx, dentry_t* buf){
  * side effects: none
  * function: directory write function
  */
-uint32_t dwrite(const dentry_t* buf){
+int32_t dwrite(const dentry_t* buf){
 
     return -1;
 }
-/* void dclose
+/* dclose
  * inputs:none
  * outputs: 0 for success, -1 for failure
  * side effects: none
  * function: directory close function
  */
-uint32_t dclose(){
+int32_t dclose(){
 
     return 0;
 }
@@ -373,43 +373,53 @@ uint32_t get_length(uint32_t inode){
     return inodes[inode].len;
 }
 
+int32_t get_idx(uint32_t inode){
+    int32_t i;
+    for(i = 0; i < MAX_DENTRY; i++){
+        if(dentries[i].inode_num == inode)
+            return i;
+    }
+    return -1;
+}
 
-uint32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
+
+int32_t f_driver(uint32_t cmd, uint32_t fd, int8_t* buf, int32_t nbytes){
     //open
-    if(cmd == 0){
+    if(cmd == OPEN){
         return fopen((const int8_t*)buf);
     }
     //read
-    else if(cmd == 1){
+    else if(cmd == READ){
         uint32_t inode = curr_pcb->file_arr[fd].inode;
         uint32_t offset = curr_pcb->file_arr[fd].position;
         return fread(inode,offset,(int8_t*)buf,nbytes);
     }
     //write
-    else if(cmd == 2){
+    else if(cmd == WRITE){
         //need to find access pcb
         uint32_t inode = curr_pcb->file_arr[fd].inode;
         uint32_t offset = curr_pcb->file_arr[fd].position;
         return fwrite(inode,offset,(const int8_t*)buf,nbytes);
     }
     //close
-    else if(cmd == 3){
+    else if(cmd == CLOSE){
         return fclose();
     }
     return -1;
 }
 
-uint32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes){
-    if(cmd == 0){
+int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, int32_t nbytes){
+    if(cmd == OPEN){
         return dopen();
     }
-    else if(cmd == 1){
+    else if(cmd == READ){
         return dread_idx(nbytes,(dentry_t*)buf);
     }
-    else if(cmd == 2){
+    else if(cmd == WRITE){
         return dwrite((const int8_t*)buf);
     }
-    else if(cmd == 3){
+    else if(cmd == CLOSE){
         return dclose();
     }
+    return -1;
 }

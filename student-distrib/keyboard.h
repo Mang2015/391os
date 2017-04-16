@@ -6,6 +6,7 @@
 #include "lib.h"
 #include "i8259.h"
 #include "terminal.h"
+#include "sys_handlers.h"
 
 
 #define KEYBOARD_BUFFER_PORT 0x60
