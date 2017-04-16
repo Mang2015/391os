@@ -143,6 +143,11 @@ int32_t execute(const uint8_t* command){
     else
         page_directory[32] = 0xC00000 | SURWON;//12MB
 
+    //flush tlb
+    asm volatile(
+        "movl %cr3, %eax \n \
+        movl %eax, %cr3");
+
     /*-------------------
     LOAD FILE INTO MEMORY
     ---------------------*/
@@ -200,19 +205,22 @@ int32_t execute(const uint8_t* command){
     AND CALL IRET
     ----------------------------*/
     asm volatile(
-        "movw $0x23, %%cs \n \
-        movw $0x2B, %%ss \n \
-        movw $0x23, %%ds \n \
+        "movw $0x23, %%ax   \n \
+        movw %%ax, %%cs \n \
+        movw $0x2B, %%ax   \n \
+        movw %%ax, %%ss \n \
+        movw $0x23, %%ax   \n \
+        movw %%ax, %%ds \n \
         pushl $0 \n \
         pushw %%cs \n \
         pushf \n \
         pushl %%esp \n \
         pushw %%ss \n \
-        movw %%esp,$0"
+        mov $0,%%esp"
         :"=r"(tss.esp0)
         :"r"(eip_val)
     );
-
+// compiler errors for lines 203-205
     //IRET
     asm ("iret");
 
