@@ -78,15 +78,18 @@ int32_t halt(uint8_t status){
         execute((uint8_t*)"shell");         // need to recheck this but I think it's fine
     }
 
-    cli();
+    //cli();
 
     // need to access current process pcb to get values for parent process
-    task_stack_t *curr_process = 0x800000 - 0x2000 * (num_processes - 1);
+    task_stack_t *curr_process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes - 1));
     process_control_block_t curr_block = curr_process->proc;
 
+    //reset pcb pointer
+    curr_pcb = curr_block.parent_pcb;
+
     //update tss esp and ss (reloading parent data)
-    tss.esp0 = curr_block.parent_esp;
-    tss.ss0 = curr_block.parent_ss;
+    tss.esp0 = curr_block.parent_esp0;
+    tss.ss0 = curr_block.parent_ss0;
 
     //back to parent process
     num_processes--;
@@ -96,27 +99,31 @@ int32_t halt(uint8_t status){
 
     //flush tlb
     asm volatile(
-        "movl %%cr3,%%eax \n \
-        movl %%eax,%%cr3"
+        "movl %cr3,%eax \n \
+        movl %eax,%cr3"
     );
 
     // change all fd flags to 0
     for (i = 2; i < 8; i++) {
         if (curr_block.file_arr[i].flags == 1) {
-            close(curr_block.file_arr[i]);
+            close(i);
         }
     }
 
-    sti();
+   //sti();
 
     // jump to execute return
     asm volatile(
-        "movzwl %%bl, %%eax \n \
-         jmp EXEC_RET"
+        "movl %0, %%eax \n \
+         movl %1, %%esp \n \
+         movl %2, %%ebp \n \
+         leave \n \
+         ret"
         :
-        :"r" (status)
+        :"r" ((uint32_t)status),"r"(curr_block.parent_esp),"r"(curr_block.parent_ebp)
     );
 
+    //this is never actually used
     return 0;
 }
 
@@ -225,8 +232,8 @@ int32_t execute(const uint8_t* command){
     if(num_processes != 1){
         process->proc.parent_pcb = (process_control_block_t*)(0x800000 - 0x2000 * (num_processes - 2));
         process->proc.parent_proc_id = num_processes-1;
-        process->proc.parent_esp = tss.esp0;
-        process->proc.parent_ss = tss.ss0;
+        process->proc.parent_esp0 = tss.esp0;
+        process->proc.parent_ss0 = tss.ss0;
     }
     process->proc.proc_id = num_processes;
 
@@ -248,6 +255,15 @@ int32_t execute(const uint8_t* command){
 
     curr_pcb = &(process->proc);
 
+    //save current esp and ebp to pcb
+    asm volatile(
+        "movl %%ebp, %0 \n \
+        movl %%esp, %1"
+        : "=r"(process->proc.parent_ebp),
+          "=r"(process->proc.parent_esp)
+    );
+
+
     /*--------------------------
     PUSH IRET CONTEXT TO STACK
     AND CALL IRET
@@ -260,7 +276,7 @@ int32_t execute(const uint8_t* command){
           pushl $0x83FFFFF \n \
           pushfl \n \
           pushl $0x23 \n \
-          pushl $0"
+          pushl %0"
           :
           :"r"(eip_val)
     );
@@ -268,10 +284,7 @@ int32_t execute(const uint8_t* command){
     //IRET
     asm ("iret");
 
-    asm volatile(
-        "EXEC_RET:"
-    );
-
+    //never is used
     return 0;
 }
 
