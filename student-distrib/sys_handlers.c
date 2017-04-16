@@ -256,20 +256,16 @@ int32_t execute(const uint8_t* command){
     AND CALL IRET
     ----------------------------*/
     asm volatile(
-        "movw $0x23, %%ax   \n \
-        movw %%ax, %%cs \n \
-        movw $0x2B, %%ax   \n \
-        movw %%ax, %%ss \n \
-        movw $0x23, %%ax   \n \
-        movw %%ax, %%ds \n \
-        pushl $0 \n \
-        pushw %%cs \n \
-        pushf \n \
-        pushl %%esp \n \
-        pushw %%ss \n \
-        mov $0,%%esp"
-        :"=r"(tss.esp0)
-        :"r"(eip_val)
+      asm volatile(
+          "movl $0x2B, %%eax   \n \
+          movw %%ax, %%ds \n \
+          pushl %%eax \n \
+          pushl $0x83FFFFF \n \
+          pushfl \n \
+          pushl $0x23 \n \
+          pushl $0"
+          :
+          :"r"(eip_val)
     );
 // compiler errors for lines 203-205
     //IRET
