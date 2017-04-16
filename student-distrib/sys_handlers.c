@@ -92,10 +92,7 @@ int32_t halt(uint8_t status){
     num_processes--;
 
     //restore parent paging
-    if(num_processes == 1)
-        page_directory[32] = 0x800000 | SURWON;//8MB
-    else
-        page_directory[32] = 0xC00000 | SURWON;//12MB
+    page_directory[32] = 0x800000 | SURWON;//8MB
 
     //flush tlb
     asm volatile(
@@ -255,8 +252,8 @@ int32_t execute(const uint8_t* command){
     PUSH IRET CONTEXT TO STACK
     AND CALL IRET
     ----------------------------*/
+
     asm volatile(
-      asm volatile(
           "movl $0x2B, %%eax   \n \
           movw %%ax, %%ds \n \
           pushl %%eax \n \
@@ -267,7 +264,7 @@ int32_t execute(const uint8_t* command){
           :
           :"r"(eip_val)
     );
-// compiler errors for lines 203-205
+
     //IRET
     asm ("iret");
 
