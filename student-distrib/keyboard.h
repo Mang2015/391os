@@ -24,6 +24,7 @@
 #define CTRL_RELEASE 0x9D
 #define L_CLEAR   0x26
 #define ENTER_PRESS 0x1C
+#define ENTER_RELEASE 0x9C
 #define SPACE_PRESS 0x39
 #define BUFFER_MAX_INDEX 127
 #define BUFFER_SIZE 128
@@ -33,6 +34,7 @@ extern void keyboard_init(void);
 extern void keyboard_handler();
 extern void caps_on();
 extern void enter_press();
+extern void enter_release();
 extern void space_press();
 extern void bksp_handler();
 extern void scrollPage();

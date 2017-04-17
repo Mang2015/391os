@@ -54,7 +54,7 @@ void init_idt(){
     idt[i].reserved0 = 0;
     idt[i].reserved1 = 1;
     idt[i].reserved2 = 1;
-    idt[i].reserved3 = 0;
+    idt[i].reserved3 = 1;//was 0
     idt[i].reserved4 = 0;
 
     //if system call, priority level is 3

@@ -74,6 +74,7 @@ volatile uint8_t line_char_buffer[BUFFER_SIZE];
 uint32_t capslock_flag;
 uint32_t shift_flag;
 uint32_t ctrl_flag;
+uint32_t enter_flag;
 
 //keeps track of the last active keyboard buffer index
 int buffIdx;
@@ -133,6 +134,8 @@ void keyboard_handler()
       space_press();
     else if (keyboard_read == ENTER_PRESS)
       enter_press();
+    else if (keyboard_read == ENTER_RELEASE)
+      enter_release();
     else if ((keyboard_read == CTRL_PRESS) || (keyboard_read == CTRL_RELEASE))
       CtrlStatus(keyboard_read);
     else if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
@@ -233,11 +236,17 @@ void space_press(){
  * function: handler for when the enter key is clicked, clears buffer
  */
 void enter_press(){
+  enter_flag = 1;
   //clear buffer
   buffIdx = -1;
   //print newline
   putc('\n');
   return;
+}
+
+
+void enter_release(){
+    enter_flag = 0;
 }
 
 /* void bksp_handler
@@ -347,15 +356,18 @@ int32_t keyboard_write(){
  *            buffer passed in by the function
  */
 int32_t keyboard_read(char* buf, uint32_t byte_count){
+    while(buffIdx == -1);
     int totalBufNum = buffIdx;
+
     if(byte_count < totalBufNum)
         totalBufNum = byte_count;
     int i;
-    for(i=0;i<=totalBufNum;i++){
+    for(i=0;i<=totalBufNum+1;i++){
       buf[i] = line_char_buffer[i];
     }
+    while(enter_flag == 0);
 
-    return i;
+    return buffIdx + 1;
 }
 
 int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count){
