@@ -262,7 +262,8 @@ void stack_fault_handler(){
  * SIDE EFFECTS: none
  */
 void gen_protect_handler(){
-    clear();
+//    clear();
+
     printf("Interrupt 13 - General Protection Exception\n");
     while(1);
 }

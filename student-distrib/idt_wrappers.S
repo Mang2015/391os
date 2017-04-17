@@ -2,8 +2,10 @@
 .globl keyboard_handler_wrapper
 .globl rtc_handler_wrapper
 .globl system_handler_wrapper
+.globl exec_ret
 
-
+.data
+    SKIP = 4
 # keyboard_handler_wrapper
 # Description: wrapper for keyboard interrupt handler to follow proper
 #               interrupt stack convention
@@ -33,7 +35,6 @@ rtc_handler_wrapper:
 # SIDE EFFECTS: none
 system_handler_wrapper:
 
-  pushl %esp
   pushl %ebp
   pushl %esi
   pushl %edi
@@ -42,14 +43,18 @@ system_handler_wrapper:
   pushl %ebx
   pushl %eax
   call system_handler
-  addl $4, %esp
+  addl $SKIP, %esp
   popl %ebx
   popl %ecx
   popl %edx
   popl %edi
   popl %esi
   popl %ebp
-  popl %esp
 
   # preserve eax as return value
   iret
+
+exec_ret:
+    movl -4(%ebp),%eax
+    leave
+    ret

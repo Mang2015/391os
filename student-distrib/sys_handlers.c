@@ -29,8 +29,7 @@ int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t ar
     asm ("movl %%edx,%0":"=r"(arg2));*/
 
     if(instr == SYS_HALT){
-        uint8_t stat = 0xFF & arg0;
-        return halt(stat);
+        return halt((uint8_t)(0xFF & arg0));
     }
     else if(instr == SYS_EXECUTE){
         return execute((const uint8_t*)arg0);
@@ -111,16 +110,30 @@ int32_t halt(uint8_t status){
     }
 
    //sti();
+   asm volatile(
+       "movl %0, %%eax \n \
+       addl $-4,%%eax \n \
+       xorl %%ebx, %%ebx \n \
+       movb %1, %%bl \n \
+       movl %%ebx,(%%eax)"
+       :
+       :"r"(curr_block->parent_ebp),"r"(status)
+       :"%eax"
+   );
 
     // jump to execute return
     asm volatile(
-        "movl %0, %%eax \n \
-         movl %1, %%esp \n \
-         movl %2, %%ebp \n \
-         leave \n \
-         ret"
+        "movl %0, %%esp"
         :
-        :"r" ((uint32_t)status),"r"(curr_block->parent_esp),"r"(curr_block->parent_ebp)
+        :"r"(curr_block->parent_esp)
+    );
+    asm volatile(
+        "movl %0, %%ebp"
+        :
+        :"r"(curr_block->parent_ebp)
+    );
+    asm volatile(
+        "jmp exec_ret"
     );
 
     //this is never actually used
@@ -135,8 +148,10 @@ int32_t halt(uint8_t status){
  */
 int32_t execute(const uint8_t* command){
 
-    if(num_processes == 2)
+    if(num_processes == 2){
+        printf("Max processes already running\n");
         return -1;
+    }
     num_processes++;
     //command line buffer
     int8_t cmd[128];
@@ -253,6 +268,9 @@ int32_t execute(const uint8_t* command){
 
     curr_pcb = &(process->proc);
 
+    tss.esp0 = (uint32_t)process + 0x1FFC;
+    tss.ss0 = KERNEL_DS;
+
     //save current esp and ebp to pcb
     asm volatile(
         "movl %%ebp, %0 \n \
@@ -262,6 +280,7 @@ int32_t execute(const uint8_t* command){
     );
 
 
+
     /*--------------------------
     PUSH IRET CONTEXT TO STACK
     AND CALL IRET
@@ -269,13 +288,13 @@ int32_t execute(const uint8_t* command){
 
     asm volatile(
           "movl $0x2B, %eax   \n \
-          movw %ax, %ds \n \
           pushl %eax \n \
           pushl $0x83FFFFF \n \
           pushfl \n \
           pushl $0x23"
     );
 
+          //movw %ax, %ds \n
     asm volatile(
         "movl %0, %%ecx \n \
         pushl %%ecx"
