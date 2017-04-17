@@ -343,6 +343,13 @@ int32_t dread(const int8_t* fname, dentry_t* buf){
 }
 
 
+/* void dread_idx
+ * inputs:  int32_t idx - index of directory
+            int8_t* buf - buffer to read in to
+ * outputs: FNAME_LEN for success, -1 for failure
+ * side effects: none
+ * function: reads in filename into buffer of directory
+ */
 int32_t dread_idx(int32_t idx, int8_t* buf){
     if(idx >= boot_block->num_dir_entries)
         return 0;
@@ -375,10 +382,22 @@ int32_t dclose(){
 }
 
 
+/* get_length
+ * inputs:inode number
+ * outputs: length of file in bytes
+ * side effects: none
+ * function: used to get length of file
+ */
 uint32_t get_length(uint32_t inode){
     return inodes[inode].len;
 }
 
+/* get_idx
+ * inputs:inode number
+ * outputs: index of dentry in fs
+ * side effects: none
+ * function: used to get index of a file given its inode
+ */
 int32_t get_idx(uint32_t inode){
     int32_t i;
     for(i = 0; i < MAX_DENTRY; i++){
@@ -389,6 +408,15 @@ int32_t get_idx(uint32_t inode){
 }
 
 
+/* f_driver
+ * input: uint32_t cmd - command number
+ *        uint32_t fd - file descriptor
+ *        void* buf - buffer to read/write
+ *        uint32_t byte_count - how many bytes to read/write
+ * output: return values from respective o/c/r/w functions, -1 if invalid cmd
+ * side effects:
+ * function: dispatcher function
+ */
 int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     //open
     if(cmd == OPEN){
@@ -414,6 +442,15 @@ int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     return -1;
 }
 
+/* d_driver
+ * input: uint32_t cmd - command number
+ *        uint32_t fd - file descriptor
+ *        void* buf - buffer to read/write
+ *        uint32_t byte_count - how many bytes to read/write
+ * output: return values from respective o/c/r/w functions, -1 if invalid cmd
+ * side effects:
+ * function: dispatcher function
+ */
 int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     if(cmd == OPEN){
         return dopen();
