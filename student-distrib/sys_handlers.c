@@ -74,7 +74,8 @@ int32_t halt(uint8_t status){
     if (num_processes == 1)
     {
         // restart shell
-        execute((uint8_t*)"shell");         // need to recheck this but I think it's fine
+        printf("Restarting shell...\n");
+        execute((uint8_t*)"shell123");         // need to recheck this but I think it's fine
     }
 
     //cli();
@@ -147,7 +148,6 @@ int32_t halt(uint8_t status){
  * SIDE EFFECTS: none
  */
 int32_t execute(const uint8_t* command){
-
     if(num_processes == 2){
         printf("Max processes already running\n");
         return -1;
@@ -164,12 +164,22 @@ int32_t execute(const uint8_t* command){
     /*--------------
     PARSE ARGUMENT
     ----------------*/
-    while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0')){
-        cmd[i] = command[i];
-        i++;
+    if(strncmp((int8_t*)command,"shell123",8) == 0){
+        num_processes--;
+        cmd[0] = 's';
+        cmd[1] = 'h';
+        cmd[2] = 'e';
+        cmd[3] = 'l';
+        cmd[4] = 'l';
+        cmd[5] = '\0';
     }
-
-    cmd[i] = '\0';
+    else{
+        while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0')){
+            cmd[i] = command[i];
+            i++;
+        }
+        cmd[i] = '\0';
+    }
 
     if(dread(cmd,&d) == -1 || d.ftype != 2){
         num_processes--;
@@ -287,7 +297,8 @@ int32_t execute(const uint8_t* command){
     ----------------------------*/
 
     asm volatile(
-          "movl $0x2B, %eax   \n \
+          "switch: \n \
+          movl $0x2B, %eax   \n \
           pushl %eax \n \
           pushl $0x83FFFFF \n \
           pushfl \n \
