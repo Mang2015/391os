@@ -136,6 +136,15 @@ int32_t close_rtc()
     return 0;
 }
 
+/* rtc_driver
+ * input: uint32_t cmd - command number
+ *        uint32_t fd - file descriptor
+ *        void* buf - buffer to read/write
+ *        uint32_t byte_count - how many bytes to read/write
+ * output: return values from respective o/c/r/w functions, -1 if invalid cmd
+ * side effects:
+ * function: dispatcher function
+ */
 int32_t rtc_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     if(cmd == OPEN){
         return open_rtc();
