@@ -349,7 +349,7 @@ int32_t dread_idx(int32_t idx, int8_t* buf){
     dentry_t d;
     read_dentry_by_index(idx,&d);
     strncpy(buf,d.fname,FNAME_LEN);
-    return 1;
+    return FNAME_LEN;
 }
 /* void dwrite
  * inputs: const int8_t* fname - name of directory

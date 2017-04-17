@@ -82,14 +82,14 @@ int32_t halt(uint8_t status){
 
     // need to access current process pcb to get values for parent process
     task_stack_t *curr_process = (task_stack_t*)(0x800000 - 0x2000 * (num_processes));
-    process_control_block_t curr_block = curr_process->proc;
+    process_control_block_t *curr_block = &curr_process->proc;
 
     //reset pcb pointer
-    curr_pcb = curr_block.parent_pcb;
+    curr_pcb = curr_block->parent_pcb;
 
     //update tss esp and ss (reloading parent data)
-    tss.esp0 = curr_block.parent_esp0;
-    tss.ss0 = curr_block.parent_ss0;
+    tss.esp0 = curr_block->parent_esp0;
+    tss.ss0 = curr_block->parent_ss0;
 
     //back to parent process
     num_processes--;
@@ -105,7 +105,7 @@ int32_t halt(uint8_t status){
 
     // change all fd flags to 0
     for (i = 2; i < 8; i++) {
-        if (curr_block.file_arr[i].flags == 1) {
+        if (curr_block->file_arr[i].flags != 0) {
             close(i);
         }
     }
@@ -120,7 +120,7 @@ int32_t halt(uint8_t status){
          leave \n \
          ret"
         :
-        :"r" ((uint32_t)status),"r"(curr_block.parent_esp),"r"(curr_block.parent_ebp)
+        :"r" ((uint32_t)status),"r"(curr_block->parent_esp),"r"(curr_block->parent_ebp)
     );
 
     //this is never actually used
@@ -138,8 +138,6 @@ int32_t execute(const uint8_t* command){
     if(num_processes == 2)
         return -1;
     num_processes++;
-    //max file size
-    //int8_t prog[4190208];
     //command line buffer
     int8_t cmd[128];
     int8_t exe[4];
@@ -307,7 +305,10 @@ int32_t read(int32_t fd, void* buf, int32_t nbytes){
     if(bytes_read == -1)
         return -1;
 
-    curr_pcb->file_arr[fd].position += bytes_read;
+    if(curr_pcb->file_arr[fd].flags == DIRECTORY)
+        curr_pcb->file_arr[fd].position++;
+    else
+        curr_pcb->file_arr[fd].position += bytes_read;
     return bytes_read;
 }
 
@@ -349,6 +350,7 @@ int32_t open(const uint8_t* filename){
             else if(d.ftype == 1){
                 curr_pcb->file_arr[i].position = get_idx(d.inode_num);
                 curr_pcb->file_arr[i].table = d_driver;
+                curr_pcb->file_arr[i].flags = DIRECTORY;
             }
             //file is file
             else if(d.ftype == 2)

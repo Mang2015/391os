@@ -19,6 +19,7 @@
 #define SYS_SET_HANDLER  9
 #define SYS_SIGRETURN  10
 #define USER 0x08000000
+#define DIRECTORY 2
 
 #define OPEN 0
 #define READ 1

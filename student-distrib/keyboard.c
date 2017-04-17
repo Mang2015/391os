@@ -239,7 +239,10 @@ void enter_press(){
   enter_flag = 1;
   //clear buffer
   buffIdx = -1;
-  memset(line_char_buffer,(int32_t)'\0',BUFFER_SIZE);
+  int32_t i;
+  for(i = 0; i < BUFFER_SIZE; i++){
+      line_char_buffer[i] = '\0';
+  }
   //print newline
   putc('\n');
   return;
