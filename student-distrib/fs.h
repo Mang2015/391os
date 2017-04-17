@@ -17,6 +17,9 @@
 #define INT_SIZE 4
 #define MAX_DB 1023
 #define MAX_DATA BLOCK_SIZE
+#define RTC_TYPE 0
+#define DIR_TYPE 1
+#define FILE_TYPE 2
 
 typedef struct dentry{
     int8_t fname[FNAME_LEN];

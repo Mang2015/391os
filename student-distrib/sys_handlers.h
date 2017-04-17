@@ -19,7 +19,26 @@
 #define SYS_SET_HANDLER  9
 #define SYS_SIGRETURN  10
 #define USER 0x08000000
+#define ON 1
+#define OFF 0
 #define DIRECTORY 2
+#define BYTE 0xFF
+#define KERNEL_BOT 0x800000
+#define PROCESS_PAGE1 0x800000
+#define PROCESS_PAGE2 0xC00000
+#define USER_ENTRY 0x08048000
+#define STACK_SIZE 0x2000
+#define STACK_SIZE4 0x1FFC
+#define MAX_FD 8
+#define MAX_PROCESS 2
+#define BUF4 4
+#define CMD_BUF 128
+#define RESTART_SIZE 8
+#define EXE0 0x7F
+#define EXE1 0x45
+#define EXE2 0x4C
+#define EXE3 0x46
+#define ENTRY_OFF 24
 
 #define OPEN 0
 #define READ 1

@@ -43,6 +43,7 @@ system_handler_wrapper:
   pushl %ebx
   pushl %eax
   call system_handler
+system_return:
   addl $SKIP, %esp
   popl %ebx
   popl %ecx
