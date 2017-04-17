@@ -340,14 +340,32 @@ int get_buf_idx(){
     return buffIdx;
 }
 
+/* keyboard_open
+ * input: NONE
+ * output: 0
+ * side effects:
+ * function:"opens" keyboard
+ */
 int32_t keyboard_open(){
     return 0;
 };
 
+/* keyboard_close
+ * input: NONE
+ * output: 0
+ * side effects:
+ * function:"closes" keyboard
+ */
 int32_t keyboard_close(){
     return 0;
 }
 
+/* keyboard_write
+ * input: NONE
+ * output: -1
+ * side effects:
+ * function:"writes" keyboard, not a real function
+ */
 int32_t keyboard_write(){
     return -1;
 }
@@ -360,8 +378,10 @@ int32_t keyboard_write(){
  *            buffer passed in by the function
  */
 int32_t keyboard_read(char* buf, uint32_t byte_count){
+    //dont let inside if buffer is empty
     while(buffIdx == -1);
     int i;
+    //loop until user presses enter
     do{
         for(i=0;i<byte_count;i++){
             buf[i] = line_char_buffer[i];
@@ -371,6 +391,15 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     return i + 1;
 }
 
+/* keyboard_driver
+ * input: uint32_t cmd - command number
+ *        uint32_t fd - file descriptor
+ *        void* buf - buffer to read/write
+ *        uint32_t byte_count - how many bytes to read/write
+ * output: return values from respective o/c/r/w functions, -1 if invalid cmd
+ * side effects:
+ * function: dispatcher function
+ */
 int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count){
     if(cmd == OPEN){
         return keyboard_open();
