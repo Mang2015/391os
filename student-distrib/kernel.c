@@ -180,6 +180,7 @@ entry (unsigned long magic, unsigned long addr)
 	int8_t* cmd = "shell";
 	system_handler(SYS_EXECUTE,(uint32_t)cmd,0,0);
 
+
 	/* Execute the first program (`shell') ... */
 	/* Spin (nicely, so we don't chew up cycles) */
 	asm volatile(".1: hlt; jmp .1;");

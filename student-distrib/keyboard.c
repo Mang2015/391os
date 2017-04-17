@@ -239,6 +239,7 @@ void enter_press(){
   enter_flag = 1;
   //clear buffer
   buffIdx = -1;
+  memset(line_char_buffer,(int32_t)'\0',BUFFER_SIZE);
   //print newline
   putc('\n');
   return;
@@ -357,17 +358,14 @@ int32_t keyboard_write(){
  */
 int32_t keyboard_read(char* buf, uint32_t byte_count){
     while(buffIdx == -1);
-    int totalBufNum = buffIdx;
-
-    if(byte_count < totalBufNum)
-        totalBufNum = byte_count;
     int i;
-    for(i=0;i<=totalBufNum+1;i++){
-      buf[i] = line_char_buffer[i];
-    }
-    while(enter_flag == 0);
+    do{
+        for(i=0;i<byte_count;i++){
+            buf[i] = line_char_buffer[i];
+        }
+    }while(enter_flag == 0);
 
-    return buffIdx + 1;
+    return i + 1;
 }
 
 int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count){
