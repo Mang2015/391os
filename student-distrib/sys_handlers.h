@@ -56,6 +56,7 @@ typedef struct file_descriptor_structure{
 }file_descriptor_structure_t;//16
 
 typedef struct pcb{
+    int8_t arguments[32];//32
     int32_t proc_id;//4
     int32_t parent_proc_id;//4
     file_descriptor_structure_t file_arr[8];//128
@@ -65,12 +66,12 @@ typedef struct pcb{
     int16_t reserved;//2
     int32_t parent_esp;//4
     int32_t parent_ebp;//4
-}process_control_block_t;//156
+}process_control_block_t;//188
 
 typedef struct task_stack{//8kb
     //pcb
     process_control_block_t proc;//146
-    int8_t stack[8192-156];
+    int8_t stack[8192-188];
 }task_stack_t;
 
 process_control_block_t *curr_pcb;

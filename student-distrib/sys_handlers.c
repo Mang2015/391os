@@ -180,8 +180,10 @@ int32_t execute(const uint8_t* command){
             cmd[i] = command[i];
             i++;
         }
-        cmd[i] = '\0';
+    //    cmd[i] = '\0';
     }
+
+
 
     if(dread(cmd,&d) == -1 || d.ftype != FILE_TYPE){
         num_processes--;
@@ -239,6 +241,12 @@ int32_t execute(const uint8_t* command){
 
     //fill in a new task stack to bottom of kernel page
     task_stack_t *process = (task_stack_t*)(KERNEL_BOT - STACK_SIZE * (num_processes));
+
+    //fill argument into pcb
+    int j = 0;
+    while((int8_t)command[i] != '\0'){
+      process->proc.arguments[j] = command[i];
+    }
 
     //fill in child pcb
     if(num_processes != 1){
@@ -415,6 +423,12 @@ int32_t close(int32_t fd){
  * SIDE EFFECTS: none
  */
 int32_t getargs(uint8_t* buf, int32_t nbytes){
+    if(buf == NULL)
+      return -1;
+    int i = 0;
+    while(curr_pcb->arguments[i] != '\0'){
+      buf[i] = arguments[i];
+    }
     return 0;
 }
 
