@@ -425,6 +425,25 @@ int32_t getargs(uint8_t* buf, int32_t nbytes){
  * SIDE EFFECTS: none
  */
 int32_t vidmap(uint8_t** screen_start){
+
+    uint32_t index = 0x08400000 / KERNEL;
+
+    if((uint32_t)screen_start == NULL ||
+        (uint32_t)screen_start < 0x08000000 || (uint32_t)screen_start >= 0x08400000)
+    {
+        return -1;
+    }
+
+    page_directory[index] = (uint32_t)page_table | URWON;
+    page_table[0] = (uint32_t)VIDEO) | URWON;
+
+    asm volatile(
+        "movl %cr3, %eax \n \
+        movl %eax, %cr3"
+    );
+
+    *screen_start = (uint8_t*)0x08400000;
+
     return 0;
 }
 
