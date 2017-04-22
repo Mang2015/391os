@@ -426,14 +426,20 @@ int32_t f_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     else if(cmd == READ){
         uint32_t inode = curr_pcb->file_arr[fd].inode;
         uint32_t offset = curr_pcb->file_arr[fd].position;
-        return fread(inode,offset,(int8_t*)buf,nbytes);
+        int32_t bytes_read = fread(inode,offset,(int8_t*)buf,nbytes);
+        if(bytes_read != -1)
+          curr_pcb->file_arr[fd].position += bytes_read;
+        return bytes_read;
     }
     //write
     else if(cmd == WRITE){
         //need to find access pcb
         uint32_t inode = curr_pcb->file_arr[fd].inode;
         uint32_t offset = curr_pcb->file_arr[fd].position;
-        return fwrite(inode,offset,(const int8_t*)buf,nbytes);
+        int32_t bytes_written = fread(inode,offset,(int8_t*)buf,nbytes);
+        if(bytes_written != -1)
+          curr_pcb->file_arr[fd].position += bytes_written;
+        return bytes_written;
     }
     //close
     else if(cmd == CLOSE){
@@ -457,6 +463,7 @@ int32_t d_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t nbytes){
     }
     else if(cmd == READ){
         uint32_t idx = curr_pcb->file_arr[fd].position;
+        curr_pcb->file_arr[fd].position++;
         return dread_idx(idx,(int8_t*)buf);
     }
     else if(cmd == WRITE){

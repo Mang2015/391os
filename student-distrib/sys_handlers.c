@@ -335,15 +335,7 @@ int32_t execute(const uint8_t* command){
 int32_t read(int32_t fd, void* buf, int32_t nbytes){
     if(fd < 0 || fd >= MAX_FD || curr_pcb->file_arr[fd].flags == OFF)
         return -1;
-    int32_t bytes_read = curr_pcb->file_arr[fd].table(READ,fd,buf,nbytes);
-    if(bytes_read == -1)
-        return -1;
-
-    if(curr_pcb->file_arr[fd].flags == DIRECTORY)
-        curr_pcb->file_arr[fd].position++;
-    else
-        curr_pcb->file_arr[fd].position += bytes_read;
-    return bytes_read;
+    return curr_pcb->file_arr[fd].table(READ,fd,buf,nbytes);
 }
 
 /* write
@@ -358,8 +350,7 @@ int32_t read(int32_t fd, void* buf, int32_t nbytes){
 int32_t write(int32_t fd, const void* buf, int32_t nbytes){
     if(fd < 0 || fd >= MAX_FD || curr_pcb->file_arr[fd].flags == OFF)
         return -1;
-    int32_t bytes_written = curr_pcb->file_arr[fd].table(WRITE,fd,(void*)buf,nbytes);
-    return bytes_written;
+    return curr_pcb->file_arr[fd].table(WRITE,fd,(void*)buf,nbytes);
 }
 
 /* open
