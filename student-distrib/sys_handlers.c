@@ -176,11 +176,11 @@ int32_t execute(const uint8_t* command){
         cmd[5] = '\0';
     }
     else{
-        while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0')){
+        while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0') && ((int8_t)command[i] != '\n')){
             cmd[i] = command[i];
             i++;
         }
-    //    cmd[i] = '\0';
+          cmd[i] = '\0';
     }
 
 
@@ -243,9 +243,11 @@ int32_t execute(const uint8_t* command){
     task_stack_t *process = (task_stack_t*)(KERNEL_BOT - STACK_SIZE * (num_processes));
 
     //fill argument into pcb
-    int j = 0;
+    int x = 0;
     while((int8_t)command[i] != '\0'){
-      process->proc.arguments[j] = command[i];
+      process->proc.arguments[x] = command[i];
+      x++;
+      i++;
     }
 
     //fill in child pcb
@@ -427,7 +429,7 @@ int32_t getargs(uint8_t* buf, int32_t nbytes){
       return -1;
     int i = 0;
     while(curr_pcb->arguments[i] != '\0'){
-      buf[i] = arguments[i];
+      buf[i] = curr_pcb->arguments[i];
     }
     return 0;
 }

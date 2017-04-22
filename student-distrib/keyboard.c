@@ -1,6 +1,8 @@
 // this is the implementation file for keyboard.h
 
 #include "keyboard.h"
+#include "lib.h"
+
 
 static uint8_t keyboard_input_make_array[47] = {
 
@@ -238,6 +240,32 @@ void space_press(){
 void enter_press(){
   enter_flag = 1;
   //clear buffer
+  if (line_char_buffer[0] == '\0' || line_char_buffer[0] == ' ') {
+    putc('\n');
+    putc('3');
+    putc('9');
+    putc('1');
+    putc('O');
+    putc('S');
+    putc('>');
+    putc(' ');
+
+    int32_t j;
+
+    buffIdx = -1;
+
+    for(j = 0; j < BUFFER_SIZE; j++) {
+      line_char_buffer[j] = '\0';
+    }
+
+    int y_coord = coordReturn(0);
+
+    placeCursor(7, y_coord);
+
+    return;
+
+  }
+
   buffIdx = -1;
   int32_t i;
   for(i = 0; i < BUFFER_SIZE; i++){
@@ -322,10 +350,21 @@ void clearScreen() {
   //clear sreen
   clear();
   //clear biffer
+
   buffIdx = -1;
   line_char_buffer[0] = ' ';
   //set cursor to top left
   resetCursor();
+
+  putc('3');
+  putc('9');
+  putc('1');
+  putc('O');
+  putc('S');
+  putc('>');
+  putc(' ');
+
+  placeCursor(7, 0);
 
   return;
 }
@@ -388,7 +427,25 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
         }
     }while(enter_flag == 0);
 
-    return i + 1;
+    if (strncmp(buf,"exit",4) == 0)
+      return i + 1;
+
+    int j;
+    j = 0;
+
+    while (buf[j] != '\0') {
+      j++;
+    }
+
+    if (j != 129)
+      buf[j] = '\n';
+
+    if (buf[127] != '\0') {
+        buf[127] = '\n';
+        return i + 1;
+      }
+
+    return i + 2;
 }
 
 /* keyboard_driver

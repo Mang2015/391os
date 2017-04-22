@@ -12,6 +12,11 @@ static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
 
+int coordReturn(int coord) {
+  if (coord)
+    return screen_x;
+  return screen_y;
+}
 /*
 * void clear(void);
 *   Inputs: void
