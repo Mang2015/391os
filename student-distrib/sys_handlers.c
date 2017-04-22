@@ -425,12 +425,13 @@ int32_t close(int32_t fd){
  * SIDE EFFECTS: none
  */
 int32_t getargs(uint8_t* buf, int32_t nbytes){
-    if(buf == NULL)
+    /*if(buf == NULL)
       return -1;
     int i = 0;
     while(curr_pcb->arguments[i] != '\0'){
       buf[i] = curr_pcb->arguments[i];
-    }
+    }*/
+    //return -1;
     return 0;
 }
 
@@ -444,11 +445,6 @@ int32_t vidmap(uint8_t** screen_start){
 
     uint32_t index = 0x08400000 / KERNEL;
 
-    if((uint32_t)screen_start == NULL ||
-        (uint32_t)screen_start < 0x08400000 || (uint32_t)screen_start >= 0x08401000)
-    {
-        return -1;
-    }
 
     page_directory[index] = (uint32_t)page_table | URWON;
     page_table[0] = (uint32_t)VIDEO | URWON;
