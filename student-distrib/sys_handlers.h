@@ -40,6 +40,7 @@
 #define EXE2 0x4C
 #define EXE3 0x46
 #define ENTRY_OFF 24
+#define VIDMEM 0x08400000
 
 #define OPEN 0
 #define READ 1

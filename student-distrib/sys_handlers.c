@@ -182,8 +182,11 @@ int32_t execute(const uint8_t* command){
         }
           cmd[i] = '\0';
     }
+
+    //get crrent process
     task_stack_t *process = (task_stack_t*)(KERNEL_BOT - STACK_SIZE * (num_processes));
 
+    //copy arguments of the command into the argument pcb buffer
     strncpy(process->proc.arguments,(const int8_t*)(command+i+1),128);
     j = 0;
     while(process->proc.arguments[j] != '\n'){
@@ -420,14 +423,15 @@ int32_t close(int32_t fd){
  * SIDE EFFECTS: none
  */
 int32_t getargs(uint8_t* buf, int32_t nbytes){
+
+    //error check
     if(buf == NULL)
       return -1;
     if(nbytes > 128) nbytes = 128;
+
+    //copy over the argument buffer into the passed in user level buffer
     strncpy((int8_t*)buf,curr_pcb->arguments,nbytes);
-    /*int i = 0;
-    while(curr_pcb->arguments[i] != '\0'){
-      buf[i] = curr_pcb->arguments[i];
-    }*/
+
     return 0;
 }
 
@@ -441,19 +445,23 @@ int32_t vidmap(uint8_t** screen_start){
 
     //uint32_t index = 0x08400000 / KERNEL;
 
+    //check bounds of the user level screenstart pointer
     if(screen_start == NULL || (uint32_t)screen_start < USER_ENTRY || (uint32_t)screen_start >= OOB){
       return -1;
     }
 
+    //initialize page
     page_directory[33] = (uint32_t)page_table | URWON;
     page_table[0] = (uint32_t)VIDEO | URWON;
 
+    //flush tlb
     asm volatile(
         "movl %cr3, %eax \n \
         movl %eax, %cr3"
     );
 
-    *screen_start = (uint8_t*)0x08400000;
+    //assign pointer to the start of video memory
+    *screen_start = (uint8_t*)VIDMEM;
 
     return 0;
 }
