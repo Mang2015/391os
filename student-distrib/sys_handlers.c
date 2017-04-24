@@ -150,6 +150,10 @@ int32_t halt(uint8_t status){
  * SIDE EFFECTS: Creates a new process, changes paging
  */
 int32_t execute(const uint8_t* command){
+
+    if(command == NULL)
+      return -1;
+
     if(num_processes == MAX_PROCESS){
         printf("Max processes already running\n");
         return -1;
