@@ -239,7 +239,7 @@ void space_press(){
  */
 void enter_press(){
   enter_flag = 1;
-  //clear buffer
+  /* Prints our shell line to screen on a new line once enter is pressed */
   if (line_char_buffer[0] == '\0' || line_char_buffer[0] == ' ') {
     putc('\n');
     putc('3');
@@ -251,7 +251,7 @@ void enter_press(){
     putc(' ');
 
     int32_t j;
-
+    // clear buffer
     buffIdx = -1;
 
     for(j = 0; j < BUFFER_SIZE; j++) {
@@ -260,6 +260,7 @@ void enter_press(){
 
     int y_coord = coordReturn(0);
 
+    // reload position of cursor
     placeCursor(7, y_coord);
 
     return;
@@ -356,6 +357,8 @@ void clearScreen() {
   //set cursor to top left
   resetCursor();
 
+  /* Once reset, print out shell line to screen and reload cursor in correct
+  position */
   putc('3');
   putc('9');
   putc('1');
@@ -427,19 +430,24 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
         }
     }while(enter_flag == 0);
 
+    // if the command is "exit", do not add new line character at the end of the string
     if (strncmp(buf,"exit",4) == 0)
       return i + 1;
 
     int j;
     j = 0;
 
+    // loop through to find null terminating character
     while (buf[j] != '\0') {
       j++;
     }
 
+    // If that character is in the bounds of the buffer, replace it with new line char
     if (j != 129)
       buf[j] = '\n';
 
+      /*if the last character in the buffer is not a null terminating char, then replace with
+       new line char and return i+1 bytes */
     if (buf[127] != '\0') {
         buf[127] = '\n';
         return i + 1;

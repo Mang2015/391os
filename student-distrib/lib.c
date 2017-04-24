@@ -12,6 +12,12 @@ static int screen_x;
 static int screen_y;
 static char* video_mem = (char *)VIDEO;
 
+/* int coordReturn(int coord);
+*       Inputs: 0 or 1 depending if user wants the x coordinate
+*               or y coordinate
+*       Return Value: screen_x or screen_y
+*       Function: Getter function for screen_x and screen_y coordinate
+* */
 int coordReturn(int coord) {
   if (coord)
     return screen_x;
