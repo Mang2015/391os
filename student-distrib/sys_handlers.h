@@ -41,6 +41,7 @@
 #define EXE3 0x46
 #define ENTRY_OFF 24
 #define VIDMEM 0x08400000
+#define VIDMAP_PAGE 33
 
 #define OPEN 0
 #define READ 1
