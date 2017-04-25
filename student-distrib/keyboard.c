@@ -77,6 +77,7 @@ uint32_t capslock_flag;
 uint32_t shift_flag;
 uint32_t ctrl_flag;
 uint32_t enter_flag;
+uint32_t back_flag;
 
 //keeps track of the last active keyboard buffer index
 int buffIdx;
@@ -99,6 +100,7 @@ void keyboard_init(void)
     capslock_flag = 0;
     shift_flag = 0;
     ctrl_flag = 0;
+    back_flag = 0;
 
 }
 
@@ -239,6 +241,8 @@ void space_press(){
  */
 void enter_press(){
   enter_flag = 1;
+  uint32_t j;
+  uint32_t y_coord;
   /* Prints our shell line to screen on a new line once enter is pressed */
   if (line_char_buffer[0] == '\0' || line_char_buffer[0] == ' ') {
     putc('\n');
@@ -250,7 +254,6 @@ void enter_press(){
     putc('>');
     putc(' ');
 
-    int32_t j;
     // clear buffer
     buffIdx = -1;
 
@@ -258,7 +261,7 @@ void enter_press(){
       line_char_buffer[j] = '\0';
     }
 
-    int y_coord = coordReturn(0);
+    y_coord = coordReturn(0);
 
     // reload position of cursor
     placeCursor(7, y_coord);
@@ -267,7 +270,6 @@ void enter_press(){
 
   }
 
-  buffIdx = -1;
   int32_t i;
   for(i = 0; i < BUFFER_SIZE; i++){
       line_char_buffer[i] = '\0';
@@ -440,6 +442,11 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
 
     if (strncmp(buf,"grep",4) == 0)
       return i + 1;
+
+    if (buf[0] == '\0') {
+      clear_line();
+      return i + 1;
+    }
 
     int j;
     j = 0;

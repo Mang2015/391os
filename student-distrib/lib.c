@@ -40,6 +40,17 @@ clear(void)
     }
 }
 
+void
+clear_line(void)
+{
+  int32_t i;
+  for (i = screen_y*NUM_COLS; i<(screen_y+1)*NUM_COLS; i++) {
+    *(uint8_t *)(video_mem + (i << 1)) = ' ';
+    *(uint8_t *)(video_mem + (i << 1) + 1) = ATTRIB;
+    screen_x = 0;
+  }
+}
+
 /* Standard printf().
  * Only supports the following format strings:
  * %%  - print a literal '%' character
