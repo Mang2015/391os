@@ -292,6 +292,7 @@ void bksp_handler() {
   //check to see that buffer is not empty
   if(buffIdx == -1)
     return;
+  line_char_buffer[buffIdx] = '\0';
   buffIdx--;
   //this function deletes last drawn char
   backspace();
@@ -432,6 +433,12 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
 
     // if the command is "exit", do not add new line character at the end of the string
     if (strncmp(buf,"exit",4) == 0)
+      return i + 1;
+
+    if (strncmp(buf, "cat",3) == 0)
+      return i + 1;
+
+    if (strncmp(buf,"grep",4) == 0)
       return i + 1;
 
     int j;
