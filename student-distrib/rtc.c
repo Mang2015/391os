@@ -50,7 +50,11 @@ void rtc_handler() {
 
   if(disp_handler) putc('1');
   send_eoi(RTC_IRQ_NUM);
-  int_flag = 1; //set int_flag for read_rtc
+
+  if(int_flag == 0)
+    int_flag = 1;
+  if(int_flag == 1)
+    int_flag =0 ;
 }
 
 /* open_rtc
@@ -81,14 +85,14 @@ int32_t open_rtc()
  */
 int32_t read_rtc()
 {
+    //Create local flag variable to check for changes in global
+    uint8_t local_flag = int_flag;
+
     // Wait for interrupts to be finished
-    while(!int_flag)
+    while(local_flag == int_flag)
     {
         //wait for interrupt handler to finish
     }
-
-    // Reset interrupt flag for next read
-    int_flag = 0;
 
     return 0;
 }
