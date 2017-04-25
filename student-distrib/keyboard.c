@@ -78,6 +78,7 @@ uint32_t shift_flag;
 uint32_t ctrl_flag;
 uint32_t enter_flag;
 uint32_t back_flag;
+uint32_t first_flag;
 
 //keeps track of the last active keyboard buffer index
 int buffIdx;
@@ -101,6 +102,7 @@ void keyboard_init(void)
     shift_flag = 0;
     ctrl_flag = 0;
     back_flag = 0;
+    first_flag = 1;
 
 }
 
@@ -280,7 +282,9 @@ void enter_press(){
   buffIdx++;
   line_char_buffer[buffIdx] = '\n';
   //print newline
-  putc('\n');
+  if (first_flag)
+    putc('\n');
+
   return;
   }
   else {
@@ -447,8 +451,10 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     }while(enter_flag == 0);
 
     // if the command is "exit", do not add new line character at the end of the string
-    if (strncmp(buf,"exit",4) == 0)
+    if (strncmp(buf,"exit",4) == 0) {
+      first_flag = 1;
       return i + 1;
+    }
 
     if (strncmp(buf, "cat",3) == 0)
       return i + 1;
@@ -459,6 +465,7 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     if (buf[0] == '\n') {
       buf[0] = '\0';
       buffIdx = -1;
+      first_flag = 0;
       return i + 1;
     }
 
