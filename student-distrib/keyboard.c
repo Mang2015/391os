@@ -241,10 +241,10 @@ void space_press(){
  */
 void enter_press(){
   enter_flag = 1;
-  uint32_t j;
-  uint32_t y_coord;
+  //uint32_t j;
+  //uint32_t y_coord;
   /* Prints our shell line to screen on a new line once enter is pressed */
-  if (line_char_buffer[0] == '\0' || line_char_buffer[0] == ' ') {
+/*  if (line_char_buffer[0] == '\n' || line_char_buffer[0] == ' ') {
     putc('\n');
     putc('3');
     putc('9');
@@ -265,18 +265,31 @@ void enter_press(){
 
     // reload position of cursor
     placeCursor(7, y_coord);
-
+    buffIdx++;
+    line_char_buffer[buffIdx] = '\n';
     return;
 
-  }
+  } */
 
   int32_t i;
+  buffIdx = -1;
+  if (line_char_buffer[0] == '\0') {
   for(i = 0; i < BUFFER_SIZE; i++){
       line_char_buffer[i] = '\0';
   }
+  buffIdx++;
+  line_char_buffer[buffIdx] = '\n';
   //print newline
   putc('\n');
   return;
+  }
+  else {
+    for(i = 0; i < BUFFER_SIZE; i++){
+        line_char_buffer[i] = '\0';
+    }
+    putc('\n');
+    return;
+  }
 }
 
 
@@ -356,7 +369,7 @@ void clearScreen() {
   //clear biffer
 
   buffIdx = -1;
-  line_char_buffer[0] = ' ';
+  line_char_buffer[0] = '\n';
   //set cursor to top left
   resetCursor();
 
@@ -443,10 +456,12 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     if (strncmp(buf,"grep",4) == 0)
       return i + 1;
 
-    if (buf[0] == '\0') {
-      clear_line();
+    if (buf[0] == '\n') {
+      buf[0] = '\0';
+      buffIdx = -1;
       return i + 1;
     }
+
 
     int j;
     j = 0;
@@ -460,8 +475,8 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     if (j != 129)
       buf[j] = '\n';
 
-      /*if the last character in the buffer is not a null terminating char, then replace with
-       new line char and return i+1 bytes */
+      //if the last character in the buffer is not a null terminating char, then replace with
+      // new line char and return i+1 bytes
     if (buf[127] != '\0') {
         buf[127] = '\n';
         return i + 1;
