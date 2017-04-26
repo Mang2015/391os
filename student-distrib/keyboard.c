@@ -276,16 +276,16 @@ void enter_press(){
   int32_t i;
   buffIdx = -1;
   if (line_char_buffer[0] == '\0') {
-  for(i = 0; i < BUFFER_SIZE; i++){
-      line_char_buffer[i] = '\0';
-  }
-  buffIdx++;
-  line_char_buffer[buffIdx] = '\n';
-  //print newline
-  if (first_flag)
-    putc('\n');
+      for(i = 0; i < BUFFER_SIZE; i++){
+          line_char_buffer[i] = '\0';
+      }
+      buffIdx++;
+      line_char_buffer[buffIdx] = '\n';
+      //print newline
+//      if (first_flag)
+        putc('\n');
 
-  return;
+      return;
   }
   else {
     for(i = 0; i < BUFFER_SIZE; i++){
@@ -456,19 +456,14 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
       return i + 1;
     }
 
-    if (strncmp(buf, "cat",3) == 0)
-      return i + 1;
-
-    if (strncmp(buf,"grep",4) == 0)
-      return i + 1;
-
+    //empty buffer is being passed
     if (buf[0] == '\n') {
       buf[0] = '\0';
+      line_char_buffer[0] = '\0';
       buffIdx = -1;
       first_flag = 0;
-      return i + 1;
+      return 0;//i+1
     }
-
 
     int j;
     j = 0;
@@ -479,17 +474,19 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     }
 
     // If that character is in the bounds of the buffer, replace it with new line char
-    if (j != 129)
+//    if (j != 129)
       buf[j] = '\n';
 
       //if the last character in the buffer is not a null terminating char, then replace with
       // new line char and return i+1 bytes
+      /*
     if (buf[127] != '\0') {
         buf[127] = '\n';
         return i + 1;
       }
+      */
 
-    return i + 2;
+    return j+2;//i+2
 }
 
 /* keyboard_driver

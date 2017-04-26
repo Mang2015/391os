@@ -221,8 +221,6 @@ int32_t execute(const uint8_t* command){
     //uint32_t eip_val = 0;
     uint32_t eip_val = *((uint32_t*)entry);
 
-    //getargs
-    //getargs(command+i,length);
 
     /*--------------
     SETUP PAGING
@@ -251,16 +249,6 @@ int32_t execute(const uint8_t* command){
     /*-------------
     CREATE NEW PCB
     ---------------*/
-
-    //fill in a new task stack to bottom of kernel page
-
-    //fill argument into pcb
-    /*int x = 0;
-    while((int8_t)command[i] != '\0'){
-      process->proc.arguments[x] = command[i];
-      x++;
-      i++;
-    }*/
 
     //fill in child pcb
     if(num_processes != 1){
@@ -315,7 +303,6 @@ int32_t execute(const uint8_t* command){
           pushl $0x23"
     );
 
-          //movw %ax, %ds \n
     asm volatile(
         "movl %0, %%ecx \n \
         pushl %%ecx"
@@ -432,6 +419,10 @@ int32_t getargs(uint8_t* buf, int32_t nbytes){
     if(buf == NULL)
       return -1;
     if(nbytes > 128) nbytes = 128;
+
+    //arguments don't exist
+    if(curr_pcb->arguments[0] == '\0')
+        return -1;
 
     //copy over the argument buffer into the passed in user level buffer
     strncpy((int8_t*)buf,curr_pcb->arguments,nbytes);

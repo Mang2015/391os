@@ -353,10 +353,13 @@ int32_t dread(const int8_t* fname, dentry_t* buf){
 int32_t dread_idx(int32_t idx, int8_t* buf){
     if(idx >= boot_block->num_dir_entries)
         return 0;
+    int32_t len = 0;
     dentry_t d;
     read_dentry_by_index(idx,&d);
     strncpy(buf,d.fname,FNAME_LEN);
-    return FNAME_LEN;
+    while(len < FNAME_LEN && buf[len] != '\0') len++;
+
+    return len;
 }
 /* void dwrite
  * inputs: const int8_t* fname - name of directory
