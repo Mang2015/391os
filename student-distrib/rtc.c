@@ -49,12 +49,12 @@ void rtc_handler() {
   inb(RW_CMOS);
 
   if(disp_handler) putc('1');
-  send_eoi(RTC_IRQ_NUM);
-
   if(int_flag == 0)
     int_flag = 1;
-  if(int_flag == 1)
-    int_flag =0 ;
+  else
+    int_flag = 0;
+  send_eoi(RTC_IRQ_NUM);
+
 }
 
 /* open_rtc
