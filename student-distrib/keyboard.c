@@ -401,25 +401,13 @@ void clearScreen() {
 
   //clear sreen
   clear();
-  //clear biffer
 
-  buffIdx = -1;
-  line_char_buffer[0] = '\n';
   //set cursor to top left
   resetCursor();
 
-  /* Once reset, print out shell line to screen and reload cursor in correct
-  position */
-  putc('3');
-  putc('9');
-  putc('1');
-  putc('O');
-  putc('S');
-  putc('>');
-  putc(' ');
-
-  placeCursor(7, 0);
-
+  //pass empty
+  line_char_buffer[0] = '\n';
+  buffIdx = -2;
   return;
 }
 
@@ -475,11 +463,22 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     while(buffIdx == -1);
     int i;
     //loop until user presses enter
-    do{
-        for(i=0;i<byte_count;i++){
-            buf[i] = line_char_buffer[i];
-        }
-    }while(enter_flag == 0);
+    if(buffIdx != -2){
+        do{
+            for(i=0;i<byte_count;i++){
+                buf[i] = line_char_buffer[i];
+            }
+        }while(enter_flag == 0);
+    }
+
+    //empty buffer is being passed
+    if (line_char_buffer[0] == '\n') {
+      buf[0] = '\0';
+      line_char_buffer[0] = '\0';
+      buffIdx = -1;
+      first_flag = 0;
+      return 0;//i+1
+    }
 
     // if the command is "exit", do not add new line character at the end of the string
     if (strncmp(buf,"exit",4) == 0) {
@@ -487,14 +486,6 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
       return i + 1;
     }
 
-    //empty buffer is being passed
-    if (buf[0] == '\n') {
-      buf[0] = '\0';
-      line_char_buffer[0] = '\0';
-      buffIdx = -1;
-      first_flag = 0;
-      return 0;//i+1
-    }
 
     int j;
     j = 0;
