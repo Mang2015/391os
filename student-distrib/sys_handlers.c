@@ -285,9 +285,6 @@ int32_t execute(const uint8_t* command){
         process->proc.parent_ss0 = tss.ss0;
         process->proc.proc_id = curr_pcb->proc_id + 1;
     }
-    else{
-        process->proc.proc_id = 0;
-    }
 
     /*-----------------
     OPEN RELEVANT FD'S

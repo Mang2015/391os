@@ -42,7 +42,10 @@ void init_shell(){
     fread(d.inode_num,0,prog_ptr,length);
 
     //set up pcb id
-    process->proc.proc_id = 0;
+    if(proc_idx == 1)
+        process->proc.proc_id = 4;
+    if(proc_idx == 2)
+        process->proc.proc_id = 8;
 
     //open stdin
     process->proc.file_arr[0].flags = ON;
@@ -64,6 +67,7 @@ void init_kernel_memory(){
     for(i = 0; i < MAX_PROCESS; i++){
         tasks->task[i].in_use = OFF;
     }
+    tasks->task[0].proc.proc_id = 0;
     mem_locs[0] = TERMINAL0;
     mem_locs[1] = TERMINAL1;
     mem_locs[2] = TERMINAL2;
