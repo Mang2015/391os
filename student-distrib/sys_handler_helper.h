@@ -9,12 +9,14 @@
 #include "terminal.h"
 #include "keyboard.h"
 
-#define SHELL1 0
-#define SHELL2 1
+#define SHELL0 0
+#define SHELL1 1
+#define SHELL2 2
 
 
 void init_kernel_memory();
 void init_shell();
+void switch_terminal();
 
 
 #endif

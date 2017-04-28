@@ -75,4 +75,20 @@ void init_kernel_memory(){
     mem_locs[4] = PROCESS1;
     mem_locs[5] = PROCESS2;
     num_processes = 0;
+    curr_terminal = SHELL0;
+    shell_dirty = 0x001;
+}
+
+
+void switch_terminal(){
+    clear();
+    curr_terminal = (curr_terminal + 1) % 3;
+    //creating shell for the first time
+    if(((0x1 << curr_terminal) & shell_dirty) == 0){
+        resetCursor();
+        shell_dirty |= 0x1 << curr_terminal;
+        //save...
+        curr_pcb = &(tasks->task[curr_terminal].proc);
+        system_handler(SYS_EXECUTE,(uint32_t)"shell123",0,0);
+    }
 }

@@ -2,6 +2,7 @@
 
 #include "keyboard.h"
 #include "lib.h"
+#include "sys_handler_helper.h"
 
 
 static uint8_t keyboard_input_make_array[47] = {
@@ -150,7 +151,7 @@ void keyboard_handler()
       AltStatus(keyboard_read);
     else if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
       clearScreen();
-    else if ((keyboard_read == F2_PRESS) && (alt_flag == 1))
+    else if ((keyboard_read == F2_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0))
       switch_terminal();
     else if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
       LRshift(keyboard_read);
@@ -380,16 +381,6 @@ void AltStatus(uint8_t keyboard_read) {
     alt_flag = 0;
 }
 
-/* void switch_terminal
- * inputs: none
- * outputs: none
- * side effects: switches into different terminal
- * function: switches into different terminal
- */
- void switch_terminal()
- {
-   //do something
- }
 
 /* void clearScreen
  * inputs: none
@@ -407,6 +398,7 @@ void clearScreen() {
 
   //pass empty
   line_char_buffer[0] = '\n';
+  line_char_buffer[1] = '\0';
   buffIdx = -2;
   return;
 }

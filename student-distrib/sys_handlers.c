@@ -182,6 +182,7 @@ int32_t execute(const uint8_t* command){
         cmd[3] = 'l';
         cmd[4] = 'l';
         cmd[5] = '\0';
+        i = 5;
         restart = 1;
     }
     else{

@@ -183,7 +183,6 @@ entry (unsigned long magic, unsigned long addr)
 //  test_rtc();
 
 	init_kernel_memory();
-	//initialize Terminals 1 and 2
 	init_shell();
 	init_shell();
 	//create Terminal0

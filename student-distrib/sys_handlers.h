@@ -92,5 +92,7 @@ kernel_tasks_t *tasks;
 
 uint32_t mem_locs[MAX_PROCESS];
 int32_t num_processes;
+int32_t curr_terminal;
+int8_t shell_dirty;
 
 #endif
