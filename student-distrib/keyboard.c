@@ -76,6 +76,7 @@ volatile uint8_t line_char_buffer[BUFFER_SIZE];
 uint32_t capslock_flag;
 uint32_t shift_flag;
 uint32_t ctrl_flag;
+uint32_t alt_flag;
 uint32_t enter_flag;
 uint32_t back_flag;
 uint32_t first_flag;
@@ -101,6 +102,7 @@ void keyboard_init(void)
     capslock_flag = 0;
     shift_flag = 0;
     ctrl_flag = 0;
+    alt_flag = 0;
     back_flag = 0;
     first_flag = 1;
 
@@ -144,8 +146,12 @@ void keyboard_handler()
       enter_release();
     else if ((keyboard_read == CTRL_PRESS) || (keyboard_read == CTRL_RELEASE))
       CtrlStatus(keyboard_read);
+    else if ((keyboard_read == ALT_PRESS) || (keyboard_read == ALT_RELEASE))
+      AltStatus(keyboard_read);
     else if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
       clearScreen();
+    else if ((keyboard_read == F2_PRESS) && (alt_flag == 1))
+      switch_terminal();
     else if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
       LRshift(keyboard_read);
     else if (keyboard_read == CAPS)
@@ -359,6 +365,31 @@ void CtrlStatus(uint8_t keyboard_read) {
   else
     ctrl_flag = 0;
 }
+
+/* void AltStatus
+ * inputs: keyboard scancode
+ * outputs: none
+ * side effects: sets alt button flag
+ * function: handler for when the alt bar is clicked
+ */
+void AltStatus(uint8_t keyboard_read) {
+  //set control flag
+  if (keyboard_read == ALT_PRESS)
+    alt_flag = 1;
+  else
+    alt_flag = 0;
+}
+
+/* void switch_terminal
+ * inputs: none
+ * outputs: none
+ * side effects: switches into different terminal
+ * function: switches into different terminal
+ */
+ void switch_terminal()
+ {
+   //do something
+ }
 
 /* void clearScreen
  * inputs: none

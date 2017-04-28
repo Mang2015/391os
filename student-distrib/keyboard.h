@@ -22,6 +22,9 @@
 #define RSHIFT_RELEASE 0xB6
 #define CTRL_PRESS 0x1D
 #define CTRL_RELEASE 0x9D
+#define ALT_PRESS 0x38
+#define ALT_RELEASE 0xB8
+#define F2_PRESS 0x3C
 #define L_CLEAR   0x26
 #define ENTER_PRESS 0x1C
 #define ENTER_RELEASE 0x9C
@@ -42,6 +45,8 @@ extern void keyboardBuff(uint8_t keyboard_read);
 extern void output_buffer();
 extern void LRshift(uint8_t keyboard_read);
 extern void CtrlStatus(uint8_t keyboard_read);
+extern void AltStatus(uint8_t keyboard_read);
+extern void switch_terminal();
 extern void clearScreen();
 extern int get_buf_idx();
 
