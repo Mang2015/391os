@@ -11,6 +11,7 @@
 #include "paging.h"
 #include "fs.h"
 #include "sys_handlers.h"
+#include "sys_handler_helper.h"
 
 /* Macros. */
 /* Check if the bit BIT in FLAGS is set. */
@@ -180,6 +181,12 @@ entry (unsigned long magic, unsigned long addr)
 //	read_file_by_name("shell");
 //	read_file_by_index();
 //  test_rtc();
+
+	init_kernel_memory();
+	//initialize Terminals 1 and 2
+	init_shell();
+	init_shell();
+	//create Terminal0
 	int8_t* cmd = "shell";
 	system_handler(SYS_EXECUTE,(uint32_t)cmd,0,0);
 

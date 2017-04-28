@@ -13,7 +13,6 @@ static int32_t set_handler(int32_t signum, void* handler_address);
 static int32_t sigreturn(void);
 
 
-static int32_t num_processes = 0;
 
 /* system_handler
  *
@@ -71,7 +70,7 @@ int32_t halt(uint8_t status){
 
     uint32_t i;
 
-    if (num_processes == 1)
+    if (curr_pcb->proc_id == 0)
     {
         // restart shell
         printf("Restarting shell...\n");
@@ -81,21 +80,20 @@ int32_t halt(uint8_t status){
     //cli();
 
     // need to access current process pcb to get values for parent process
-    task_stack_t *curr_process = (task_stack_t*)(KERNEL_BOT - STACK_SIZE * (num_processes));
-    process_control_block_t *curr_block = &curr_process->proc;
-
-    //reset pcb pointer
-    curr_pcb = curr_block->parent_pcb;
-
-    //update tss esp and ss (reloading parent data)
-    tss.esp0 = curr_block->parent_esp0;
-    tss.ss0 = curr_block->parent_ss0;
+    task_stack_t *curr_process = (task_stack_t*)curr_pcb;
+    curr_process->in_use = OFF;
 
     //back to parent process
     num_processes--;
 
+    //update tss esp and ss (reloading parent data)
+    tss.esp0 = curr_pcb->parent_esp0;
+    tss.ss0 = curr_pcb->parent_ss0;
+
+
     //restore parent paging
-    page_directory[32] = PROCESS_PAGE1 | SURWON;//8MB
+    int32_t proc_idx = curr_pcb->parent_pcb->idx;
+    page_directory[32] = mem_locs[proc_idx] | SURWON;
 
     //flush tlb
     asm volatile(
@@ -105,7 +103,7 @@ int32_t halt(uint8_t status){
 
     // change all fd flags to 0
     for (i = 2; i < MAX_FD; i++) {
-        if (curr_block->file_arr[i].flags != 0) {
+        if (curr_pcb->file_arr[i].flags != 0) {
             close(i);
         }
     }
@@ -118,7 +116,7 @@ int32_t halt(uint8_t status){
        movb %1, %%bl \n \
        movl %%ebx,(%%eax)"
        :
-       :"r"(curr_block->parent_ebp),"r"(status)
+       :"r"(curr_pcb->parent_ebp),"r"(status)
        :"%eax"
    );
 
@@ -126,13 +124,17 @@ int32_t halt(uint8_t status){
     asm volatile(
         "movl %0, %%esp"
         :
-        :"r"(curr_block->parent_esp)
+        :"r"(curr_pcb->parent_esp)
     );
     asm volatile(
         "movl %0, %%ebp"
         :
-        :"r"(curr_block->parent_ebp)
+        :"r"(curr_pcb->parent_ebp)
     );
+
+    //reset pcb pointer
+    curr_pcb = curr_pcb->parent_pcb;
+
     asm volatile(
         "jmp exec_ret"
     );
@@ -166,6 +168,8 @@ int32_t execute(const uint8_t* command){
     dentry_t d;
     int32_t i = 0, j;
     int32_t length = 0;
+    int32_t process_idx;
+    int32_t restart = 0;
 
     /*--------------
     PARSE ARGUMENT
@@ -178,6 +182,7 @@ int32_t execute(const uint8_t* command){
         cmd[3] = 'l';
         cmd[4] = 'l';
         cmd[5] = '\0';
+        restart = 1;
     }
     else{
         while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0') && ((int8_t)command[i] != '\n')){
@@ -188,22 +193,38 @@ int32_t execute(const uint8_t* command){
     }
 
     //get crrent process
-    task_stack_t *process = (task_stack_t*)(KERNEL_BOT - STACK_SIZE * (num_processes));
+    task_stack_t *process;
+    if(restart){
+        process_idx = curr_pcb->idx;
+        process = &tasks->task[process_idx];
+    }
+    else{
+        for(i = 0; i < MAX_PROCESS; i++){
+            if(tasks->task[i].in_use == OFF){
+               tasks->task[i].in_use = ON;
+               process = &tasks->task[i];
+               process_idx = i;
+               break;
+            }
+        }
+    }
 
     //copy arguments of the command into the argument pcb buffer
     strncpy(process->proc.arguments,(const int8_t*)(command+i+1),128);
     j = 0;
-    while(process->proc.arguments[j] != '\n'){
+    while(process->proc.arguments[j] != '\0' && process->proc.arguments[j] != '\n'){
         j++;
     }
     process->proc.arguments[j] = '\0';
 
     if(dread(cmd,&d) == -1 || d.ftype != FILE_TYPE){
         num_processes--;
+        tasks->task[process_idx].in_use = OFF;
         return -1;
     }
     if(fread(d.inode_num,0,exe,BUF4) != BUF4){
         num_processes--;
+        tasks->task[process_idx].in_use = OFF;
         return -1;
     }
 
@@ -213,6 +234,7 @@ int32_t execute(const uint8_t* command){
     ----------------*/
     if(exe[0] != EXE0 || exe[1] != EXE1 || exe[2] != EXE2 || exe[3] != EXE3){
         num_processes--;
+        tasks->task[process_idx].in_use = OFF;
         return -1;
     }
 
@@ -225,10 +247,14 @@ int32_t execute(const uint8_t* command){
     /*--------------
     SETUP PAGING
     ----------------*/
+    page_directory[32] = mem_locs[process_idx] | SURWON;
+    process->proc.idx = process_idx;
+    /*
     if(num_processes == 1)
         page_directory[32] = PROCESS_PAGE1 | SURWON;//8MB
     else
         page_directory[32] = PROCESS_PAGE2 | SURWON;//12MB
+        */
 
     //flush tlb
     asm volatile(
@@ -242,6 +268,7 @@ int32_t execute(const uint8_t* command){
     int8_t *prog_ptr = (int8_t*)USER_ENTRY;
     if(fread(d.inode_num,0,prog_ptr,length) != length){
         num_processes--;
+        tasks->task[process_idx].in_use = OFF;
         return -1;
     }
 
@@ -251,13 +278,16 @@ int32_t execute(const uint8_t* command){
     ---------------*/
 
     //fill in child pcb
-    if(num_processes != 1){
-        process->proc.parent_pcb = (process_control_block_t*)(KERNEL_BOT - STACK_SIZE * (num_processes - 1));
-        process->proc.parent_proc_id = num_processes-1;
+    if(num_processes > 3 && !restart){
+        process->proc.parent_pcb = curr_pcb;
+        process->proc.parent_proc_id = curr_pcb->proc_id;
         process->proc.parent_esp0 = tss.esp0;
         process->proc.parent_ss0 = tss.ss0;
+        process->proc.proc_id = curr_pcb->proc_id + 1;
     }
-    process->proc.proc_id = num_processes;
+    else{
+        process->proc.proc_id = 0;
+    }
 
     /*-----------------
     OPEN RELEVANT FD'S

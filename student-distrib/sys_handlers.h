@@ -25,13 +25,17 @@
 #define DIRECTORY 2
 #define BYTE 0xFF
 #define KERNEL_BOT 0x800000
-#define PROCESS_PAGE1 0x800000
-#define PROCESS_PAGE2 0xC00000
+#define TERMINAL0 0x800000
+#define TERMINAL1 0xC00000
+#define TERMINAL2 0x1000000
+#define PROCESS0 0x1400000
+#define PROCESS1 0x1800000
+#define PROCESS2 0x1C00000
 #define USER_ENTRY 0x08048000
 #define STACK_SIZE 0x2000
 #define STACK_SIZE4 0x1FFC
 #define MAX_FD 8
-#define MAX_PROCESS 2
+#define MAX_PROCESS 6
 #define BUF4 4
 #define CMD_BUF 128
 #define RESTART_SIZE 8
@@ -69,14 +73,24 @@ typedef struct pcb{
     int16_t reserved;//2
     int32_t parent_esp;//4
     int32_t parent_ebp;//4
-}process_control_block_t;//284
+    uint32_t idx;//4
+}process_control_block_t;//288
 
 typedef struct task_stack{//8kb
     //pcb
-    process_control_block_t proc;//146
-    int8_t stack[8192-284];
+    process_control_block_t proc;//288
+    int32_t in_use;
+    int8_t stack[8192-288-4];
 }task_stack_t;
 
+typedef struct kernel_tasks{//48KB
+    task_stack_t task[6];
+}kernel_tasks_t;
+
 process_control_block_t *curr_pcb;
+kernel_tasks_t *tasks;
+
+uint32_t mem_locs[MAX_PROCESS];
+int32_t num_processes;
 
 #endif
