@@ -70,7 +70,7 @@ int32_t halt(uint8_t status){
 
     uint32_t i;
 
-    if (curr_pcb->proc_id == 0)
+    if (curr_pcb->proc_id == 0 || curr_pcb->proc_id == 4 || curr_pcb->proc_id == 8)
     {
         // restart shell
         printf("Restarting shell...\n");
