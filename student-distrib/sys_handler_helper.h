@@ -16,7 +16,6 @@
 
 void init_kernel_memory();
 void init_shell();
-void switch_terminal();
-
+void switch_terminal(int32_t shell);
 
 #endif

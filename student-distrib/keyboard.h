@@ -24,7 +24,9 @@
 #define CTRL_RELEASE 0x9D
 #define ALT_PRESS 0x38
 #define ALT_RELEASE 0xB8
+#define F1_PRESS 0x3B
 #define F2_PRESS 0x3C
+#define F3_PRESS 0x3D
 #define L_CLEAR   0x26
 #define ENTER_PRESS 0x1C
 #define ENTER_RELEASE 0x9C

@@ -80,7 +80,7 @@ void init_kernel_memory(){
 }
 
 
-void switch_terminal(){
+void switch_terminal(int32_t shell){
     clear();
     curr_terminal = (curr_terminal + 1) % 3;
     //creating shell for the first time
