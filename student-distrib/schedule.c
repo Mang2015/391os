@@ -16,3 +16,8 @@ void pit_init(void)
     // enable interrupts on PIC
     enable_irq(PIT_IRQ_NUM);
 }
+
+void pit_handler()
+{
+    //this should handle the round robin
+}

@@ -18,5 +18,6 @@
 #define MASK_FREQ 0xFF
 
 extern void pit_init(void);
+extern void pit_handler();
 
 #endif
