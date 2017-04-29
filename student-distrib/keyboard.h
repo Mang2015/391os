@@ -50,6 +50,8 @@ extern void CtrlStatus(uint8_t keyboard_read);
 extern void AltStatus(uint8_t keyboard_read);
 extern void clearScreen();
 extern int get_buf_idx();
+extern void set_buf_idx(int32_t index);
+extern void clear_buffer();
 
 int32_t keyboard_open();
 int32_t keyboard_close();

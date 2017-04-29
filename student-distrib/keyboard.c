@@ -423,6 +423,10 @@ int get_buf_idx(){
     return buffIdx;
 }
 
+void set_buf_idx(int32_t index){
+  buffIdx = index;
+}
+
 /* keyboard_open
  * input: NONE
  * output: 0
@@ -536,4 +540,12 @@ int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_coun
         return keyboard_close();
     }
     return -1;
+}
+
+void clear_buffer(){
+  int32_t i;
+  for(i = 0; i < 128; i++){
+    line_char_buffer[i] = '\0';
+  }
+  buffIdx = -1;
 }

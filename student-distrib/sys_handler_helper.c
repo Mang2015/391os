@@ -1,6 +1,11 @@
 #include "sys_handler_helper.h"
 
 uint32_t vid_backups[] = {BACKUP0,BACKUP1,BACKUP2};
+uint8_t buf_backup0[128];
+uint8_t buf_backup1[128];
+uint8_t buf_backup2[128];
+uint8_t *buf_backups[] = {buf_backup0,buf_backup1,buf_backup2};
+int32_t buff_idx_backups[3];
 uint32_t xcoord_backups[3];
 uint32_t ycoord_backups[3];
 
@@ -90,7 +95,9 @@ void switch_terminal(int32_t shell){
     //save video memory and cursor position of current task and keyboard
     xcoord_backups[curr_terminal] = coordReturn(1);
     ycoord_backups[curr_terminal] = coordReturn(0);
+    buff_idx_backups[curr_terminal] = get_buf_idx();
     memcpy((void*)vid_backups[curr_terminal],(const void*)VIDEO,4096);
+    memcpy((void*)buf_backups[curr_terminal],(const void*)line_char_buffer,128);
     clear();
 
     curr_terminal = shell;
@@ -98,6 +105,7 @@ void switch_terminal(int32_t shell){
 
     //creating terminal for the first time
     if(((0x1 << curr_terminal) & shell_dirty) == 0){
+        clear_buffer();
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;
         //save...
@@ -111,6 +119,8 @@ void switch_terminal(int32_t shell){
       memcpy((void*)VIDEO,(const void*)vid_backups[curr_terminal],4096);
       //resetCursor();
       //terminal_write((const char*)VIDEO,2000);
+      memcpy((void*)line_char_buffer,(const void*)buf_backups[curr_terminal],128);
+      set_buf_idx(buff_idx_backups[curr_terminal]);
       placeCursor(xcoord_backups[curr_terminal],ycoord_backups[curr_terminal]);
     }
   //  sti();
