@@ -305,6 +305,9 @@ void terminal_scroll(){
   */
 void placeCursor(int x, int y){
 
+  screen_x = x;
+  screen_y = y;
+
   unsigned short position=(y*NUM_COLS) + x;
 
   // cursor LOW port to vga INDEX register
