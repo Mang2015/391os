@@ -47,6 +47,10 @@ void paging_init(void)
     entry = VIDEO;
     entry |= RWON;
     page_table[VIDEO >> 12] = entry;
+    page_table[VIDEO >> 12 + 1] = entry + 4096;
+    page_table[VIDEO >> 12 + 2] = entry + 4096 * 2;
+    page_table[VIDEO >> 12 + 3] = entry + 4096 * 3;
+
 
     // enable paging used the appropriate control registers
     enable_paging();
