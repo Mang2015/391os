@@ -1,5 +1,9 @@
 #include "sys_handler_helper.h"
 
+uint32_t vid_backups[] = {BACKUP0,BACKUP1,BACKUP2};
+uint32_t xcoord_backups[3];
+uint32_t ycoord_backups[3];
+
 void init_shell(){
     if(num_processes >= 2)
         return;
@@ -81,22 +85,33 @@ void init_kernel_memory(){
 
 
 void switch_terminal(int32_t shell){
-    clear();
-    curr_terminal = (curr_terminal + 1) % 3;
-
+    if(shell == curr_terminal || shell < SHELL0 || shell > SHELL2)
+      return;
     //save video memory and cursor position of current task and keyboard
+    xcoord_backups[curr_terminal] = coordReturn(1);
+    ycoord_backups[curr_terminal] = coordReturn(0);
+    memcpy((void*)vid_backups[curr_terminal],(const void*)VIDEO,4096);
+    clear();
 
+    curr_terminal = shell;
+    curr_pcb = &(tasks->task[curr_terminal].proc);
 
-    //creating shell for the first time
+    //creating terminal for the first time
     if(((0x1 << curr_terminal) & shell_dirty) == 0){
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;
         //save...
-        curr_pcb = &(tasks->task[curr_terminal].proc);
         //send_eoi(1);
         sti();
         system_handler(SYS_EXECUTE,(uint32_t)"shell123",0,0);
     }
 
     //ELSE load video memory and cursor location and keyboard
+    else{
+      memcpy((void*)VIDEO,(const void*)vid_backups[curr_terminal],4096);
+      //resetCursor();
+      //terminal_write((const char*)VIDEO,2000);
+      placeCursor(xcoord_backups[curr_terminal],ycoord_backups[curr_terminal]);
+    }
+  //  sti();
 }
