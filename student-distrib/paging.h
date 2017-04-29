@@ -9,6 +9,9 @@
 #define DIRECTORY_SIZE 1024
 #define PAGE_SIZE (DIRECTORY_SIZE * 4)
 #define VIDEO 0xB8000
+#define BACKUP0 0xBC000
+#define BACKUP1 0xC0000
+#define BACKUP2 0xC4000
 #define KERNEL 0x400000
 
 #define RW 0x02
