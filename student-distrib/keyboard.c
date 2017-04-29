@@ -400,6 +400,12 @@ void clearScreen() {
   //set cursor to top left
   resetCursor();
 
+  int i;
+
+  for (i = 0; i < BUFFER_SIZE; i++)
+    line_char_buffer[i] = '\0';
+
+
   //pass empty
   line_char_buffer[0] = '\n';
   line_char_buffer[1] = '\0';
@@ -497,12 +503,12 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
 
       //if the last character in the buffer is not a null terminating char, then replace with
       // new line char and return i+1 bytes
-      /*
+
     if (buf[127] != '\0') {
         buf[127] = '\n';
         return i + 1;
       }
-      */
+
 
     return j+2;//i+2
 }
