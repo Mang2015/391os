@@ -83,12 +83,20 @@ void init_kernel_memory(){
 void switch_terminal(int32_t shell){
     clear();
     curr_terminal = (curr_terminal + 1) % 3;
+
+    //save video memory and cursor position of current task and keyboard
+
+
     //creating shell for the first time
     if(((0x1 << curr_terminal) & shell_dirty) == 0){
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;
         //save...
         curr_pcb = &(tasks->task[curr_terminal].proc);
+        //send_eoi(1);
+        sti();
         system_handler(SYS_EXECUTE,(uint32_t)"shell123",0,0);
     }
+
+    //ELSE load video memory and cursor location and keyboard
 }

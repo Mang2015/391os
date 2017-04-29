@@ -8,6 +8,7 @@
 #include "rtc.h"
 #include "terminal.h"
 #include "keyboard.h"
+#include "i8259.h"
 
 #define SHELL0 0
 #define SHELL1 1
