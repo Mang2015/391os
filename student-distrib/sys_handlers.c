@@ -85,6 +85,10 @@ int32_t halt(uint8_t status){
         execute((uint8_t*)"shell123");
     }
 
+
+    //add parent process to scheduler
+    schedule_arr[i] = curr_pcb->parent_pcb;
+
     //cli();
 
     // need to access current process pcb to get values for parent process
@@ -337,7 +341,14 @@ int32_t execute(const uint8_t* command){
         break;
       }
     }
-
+    if(curr_pcb->proc_id != 0 && curr_pcb->proc_id != 4 && curr_pcb->proc_id != 8){
+        for(i = 0; i < 6; i++){
+            if(schedule_arr[i] == curr_pcb->parent_pcb){
+                schedule_arr[i] = NULL;
+                break;
+            }
+        }
+    }
     //save current esp and ebp to pcb
     asm volatile(
         "movl %%ebp, %0 \n \
