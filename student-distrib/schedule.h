@@ -17,7 +17,11 @@
 #define DIV_100HZ 1193180/100
 #define MASK_FREQ 0xFF
 
+int32_t curr;
+
 extern void pit_init(void);
 extern void pit_handler();
+
+
 
 #endif

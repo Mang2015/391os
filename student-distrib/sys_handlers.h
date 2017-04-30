@@ -7,6 +7,7 @@
 #include "rtc.h"
 #include "terminal.h"
 #include "keyboard.h"
+#include "schedule.h"
 
 #define SYS_HALT    1
 #define SYS_EXECUTE 2
@@ -89,6 +90,8 @@ typedef struct kernel_tasks{//48KB
 
 process_control_block_t *curr_pcb;
 kernel_tasks_t *tasks;
+
+process_control_block_t *schedule_arr[6];
 
 uint32_t mem_locs[MAX_PROCESS];
 int32_t num_processes;

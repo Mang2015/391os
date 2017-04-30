@@ -72,7 +72,7 @@ int32_t halt(uint8_t status){
 
     //remove process from scheduler
     for(i = 0; i < 6; i++){
-      if(schedule_arr[i] == (task_stack_t*)curr_pcb)){
+      if(schedule_arr[i] == curr_pcb){
         schedule_arr[i] = NULL;
         break;
       }
@@ -166,24 +166,17 @@ int32_t execute(const uint8_t* command){
     if(command == NULL)
       return -1;
 
-    if(num_processes == MAX_PROCESS){
-        printf("Max processes already running\n");
-        return -1;
-    }
-    num_processes++;
     //command line buffer
     int8_t cmd[CMD_BUF];
     int8_t exe[BUF4];
     int8_t entry[BUF4];
     dentry_t d;
-    int32_t i = 0, j;
     int32_t length = 0;
     int32_t process_idx;
+    int32_t i = 0, j;
     int32_t restart = 0;
 
-    /*--------------
-    PARSE ARGUMENT
-    ----------------*/
+
     if(strncmp((int8_t*)command,"shell123",RESTART_SIZE) == 0){
         num_processes--;
         cmd[0] = 's';
@@ -195,7 +188,29 @@ int32_t execute(const uint8_t* command){
         i = 5;
         restart = 1;
     }
-    else{
+
+    if(num_processes == MAX_PROCESS){
+        printf("Max processes already running\n");
+        return -1;
+    }
+    num_processes++;
+
+
+    /*--------------
+    PARSE ARGUMENT
+    ----------------*/
+  /*  if(strncmp((int8_t*)command,"shell123",RESTART_SIZE) == 0){
+        num_processes--;
+        cmd[0] = 's';
+        cmd[1] = 'h';
+        cmd[2] = 'e';
+        cmd[3] = 'l';
+        cmd[4] = 'l';
+        cmd[5] = '\0';
+        i = 5;
+        restart = 1;
+    }*/
+    if(!restart){
         while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0') && ((int8_t)command[i] != '\n')){
             cmd[i] = command[i];
             i++;
@@ -320,7 +335,7 @@ int32_t execute(const uint8_t* command){
     //add process to be scheduled
     for(i = 0; i < 6; i++){
       if(schedule_arr[i] == NULL){
-        schedule_arr[i] = (task_stack_t*)curr_pcb;
+        schedule_arr[i] = curr_pcb;
         break;
       }
     }
