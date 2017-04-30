@@ -70,11 +70,19 @@ int32_t halt(uint8_t status){
 
     uint32_t i;
 
+    //remove process from scheduler
+    for(i = 0; i < 6; i++){
+      if(schedule_arr[i] == (task_stack_t*)curr_pcb)){
+        schedule_arr[i] = NULL;
+        break;
+      }
+    }
+
     if (curr_pcb->proc_id == 0 || curr_pcb->proc_id == 4 || curr_pcb->proc_id == 8)
     {
         // restart shell
         printf("Restarting shell...\n");
-        execute((uint8_t*)"shell123");         // need to recheck this but I think it's fine
+        execute((uint8_t*)"shell123");
     }
 
     //cli();
@@ -82,6 +90,8 @@ int32_t halt(uint8_t status){
     // need to access current process pcb to get values for parent process
     task_stack_t *curr_process = (task_stack_t*)curr_pcb;
     curr_process->in_use = OFF;
+
+
 
     //back to parent process
     num_processes--;
@@ -306,6 +316,14 @@ int32_t execute(const uint8_t* command){
 
     tss.esp0 = (uint32_t)process + STACK_SIZE4;
     tss.ss0 = KERNEL_DS;
+
+    //add process to be scheduled
+    for(i = 0; i < 6; i++){
+      if(schedule_arr[i] == NULL){
+        schedule_arr[i] = (task_stack_t*)curr_pcb;
+        break;
+      }
+    }
 
     //save current esp and ebp to pcb
     asm volatile(
