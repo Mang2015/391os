@@ -74,14 +74,17 @@ typedef struct pcb{
     int16_t reserved;//2
     int32_t parent_esp;//4
     int32_t parent_ebp;//4
+    int32_t sched_ebp;//4
+    int32_t sched_esp;//4
+    int32_t sched_eip;//4
     uint32_t idx;//4
-}process_control_block_t;//288
+}process_control_block_t;//300
 
 typedef struct task_stack{//8kb
     //pcb
-    process_control_block_t proc;//288
+    process_control_block_t proc;//300
     int32_t in_use;
-    int8_t stack[8192-288-4];
+    int8_t stack[8192-300-4];
 }task_stack_t;
 
 typedef struct kernel_tasks{//48KB

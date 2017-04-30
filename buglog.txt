@@ -4,3 +4,4 @@ ALL CURRENT BUGS:
 2) "CAT (space)" not working
 3) CNTRL-L AFTER FILLING BUFFER NOT WORKING
 4) PAGE FAULT EXITING OUT OF TERMS 1 AND 2
+    - problem with all shells being in one terminal then trying to exit out the other terminals --> you get a page fault
