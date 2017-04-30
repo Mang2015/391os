@@ -8,6 +8,7 @@ uint8_t *buf_backups[] = {buf_backup0,buf_backup1,buf_backup2};
 int32_t buff_idx_backups[3];
 uint32_t xcoord_backups[3];
 uint32_t ycoord_backups[3];
+process_control_block_t *pcb_backups[3];
 
 void init_shell(){
     if(num_processes >= 2)
@@ -99,12 +100,13 @@ void switch_terminal(int32_t shell){
     memcpy((void*)vid_backups[curr_terminal],(const void*)VIDEO,4096);
     memcpy((void*)buf_backups[curr_terminal],(const void*)line_char_buffer,128);
     clear();
+    pcb_backups[curr_terminal] = curr_pcb;
 
     curr_terminal = shell;
-    curr_pcb = &(tasks->task[curr_terminal].proc);
 
     //creating terminal for the first time
     if(((0x1 << curr_terminal) & shell_dirty) == 0){
+        curr_pcb = &(tasks->task[curr_terminal].proc);
         clear_buffer();
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;
@@ -122,6 +124,7 @@ void switch_terminal(int32_t shell){
       memcpy((void*)line_char_buffer,(const void*)buf_backups[curr_terminal],128);
       set_buf_idx(buff_idx_backups[curr_terminal]);
       placeCursor(xcoord_backups[curr_terminal],ycoord_backups[curr_terminal]);
+      curr_pcb = pcb_backups[curr_terminal];
     }
   //  sti();
 }
