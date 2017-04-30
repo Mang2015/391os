@@ -102,14 +102,14 @@ void switch_terminal(int32_t shell){
     clear();
     pcb_backups[curr_terminal] = curr_pcb;
 
-    asm (
+   /* asm (
         "movl %%ebp, %0"
         :"=r"(curr_pcb->sched_ebp)
       );
     asm (
         "movl %%esp, %0"
         :"=r"(curr_pcb->sched_esp)
-      );
+      );*/
 
     curr_terminal = shell;
 
@@ -130,8 +130,8 @@ void switch_terminal(int32_t shell){
       set_buf_idx(buff_idx_backups[curr_terminal]);
       placeCursor(xcoord_backups[curr_terminal],ycoord_backups[curr_terminal]);
       curr_pcb = pcb_backups[curr_terminal];
-      tss.esp0 = (uint32_t)(curr_pcb+STACK_SIZE4);
-      asm (
+      //tss.esp0 = (uint32_t)(curr_pcb+STACK_SIZE4);
+    /*  asm (
           "movl %0, %%ebp"
           :
           :"r"(curr_pcb->sched_ebp)
@@ -140,8 +140,14 @@ void switch_terminal(int32_t shell){
             "movl %0, %%esp"
             :
             :"r"(curr_pcb->sched_esp)
-        );
+        );*/
+
         page_directory[32] = mem_locs[curr_pcb->idx] | SURWON;
+        //flush tlb
+        asm volatile(
+            "movl %cr3,%eax \n \
+            movl %eax,%cr3"
+        );
 
     }
 }
