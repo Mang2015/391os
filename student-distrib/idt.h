@@ -6,12 +6,14 @@
 #include "lib.h"
 #include "keyboard.h"
 #include "rtc.h"
+#include "schedule.h"
 #include "idt_wrappers.h"
 #include "sys_handlers.h"
 
 #define SYS_CALL 0x80
 #define RTC 0x28
 #define KEYBOARD 0x21
+#define PIT 0x20
 #define NUM_SYS_HANDLERS 20
 #define RESERVED 15
 

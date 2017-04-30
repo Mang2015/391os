@@ -70,6 +70,8 @@ void init_idt(){
         SET_IDT_ENTRY(idt[i],keyboard_handler_wrapper);
     else if(i == RTC)
         SET_IDT_ENTRY(idt[i],rtc_handler_wrapper);
+    else if(i == PIT)
+        SET_IDT_ENTRY(idt[i],pit_handler_wrapper);
     else{
         idt[i].present = 0;
         SET_IDT_ENTRY(idt[i],exception_handler);

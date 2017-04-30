@@ -1,5 +1,6 @@
 
 .globl keyboard_handler_wrapper
+.globl pit_handler_wrapper
 .globl rtc_handler_wrapper
 .globl system_handler_wrapper
 .globl exec_ret
@@ -14,6 +15,17 @@
 keyboard_handler_wrapper:
   pusha
   call keyboard_handler
+  popa
+  iret
+
+# pit_handler_wrapper
+# Description: wrapper for PIT interrupt handler to follow proper
+#               interrupt stack convention
+# INPUT/OUTPUT: none
+# SIDE EFFECTS: none
+pit_handler_wrapper:
+  pusha
+  call pit_handler
   popa
   iret
 
