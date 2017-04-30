@@ -492,7 +492,7 @@ int32_t getargs(uint8_t* buf, int32_t nbytes){
 
     //arguments don't exist
     if(curr_pcb->arguments[0] == '\0')
-        return -1;
+        return 0;
 
     //copy over the argument buffer into the passed in user level buffer
     strncpy((int8_t*)buf,curr_pcb->arguments,nbytes);
