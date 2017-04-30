@@ -400,15 +400,10 @@ void clearScreen() {
   //set cursor to top left
   resetCursor();
 
-  int i;
-
-  for (i = 0; i < BUFFER_SIZE; i++)
-    line_char_buffer[i] = '\0';
-
+  clear_buffer();
 
   //pass empty
   line_char_buffer[0] = '\n';
-  line_char_buffer[1] = '\0';
   buffIdx = -2;
   return;
 }
@@ -469,20 +464,22 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
     while(buffIdx == -1);
     int i;
     //loop until user presses enter
-    if(buffIdx != -2){
+  //  if(buffIdx != -2){
         do{
             for(i=0;i<byte_count;i++){
                 buf[i] = line_char_buffer[i];
             }
+            if (buffIdx == -2)
+              enter_flag = 1;
         }while(enter_flag == 0);
-    }
+  //  }
 
     //empty buffer is being passed
     if (line_char_buffer[0] == '\n') {
       buf[0] = '\0';
       line_char_buffer[0] = '\0';
       buffIdx = -1;
-      first_flag = 0;
+      enter_flag = 0;
       return 0;//i+1
     }
 
