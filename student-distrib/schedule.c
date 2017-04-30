@@ -1,6 +1,8 @@
 //this is for code for scheduler
 #include "schedule.h"
 
+uint32_t sched_vid_backups[] = {BACKUP0,BACKUP1,BACKUP2};
+
 void pit_init(void)
 {
     /*
@@ -23,6 +25,8 @@ void pit_init(void)
     curr = -1;
 }
 
+
+
 void pit_handler()
 {
     send_eoi(PIT_IRQ_NUM);
@@ -37,21 +41,36 @@ void pit_handler()
     }
 
     //no processes to schedule or nothing to update
-    if(last == curr){
+    if(last == curr || !schedule_arr[curr]){
         return;
     }
+
+    curr_pcb = schedule_arr[curr];
+
 
     //write code that turns on "display to screen" only for running process
     //processes running in background write to their own backups
 
-    curr_pcb = schedule_arr[curr];
+
+    if((curr_pcb->proc_id)/4 == curr_terminal){
+        page_table[VIDEO>>12] = VIDEO | RWON;
+    }else{
+
+        int term_to_write = (curr_pcb->proc_id)/4;
+        page_table[(VIDEO>>12)] = sched_vid_backups[term_to_write] | RWON;
+
+    }
+     //flush tlb
+    asm volatile(
+        "movl %cr3,%eax \n \
+        movl %eax,%cr3"
+    );
+
+
 
     //context switching
-  /*  asm (
-      "movl %%eip, %0"
-      :"=r"(schedule_arr[last]->sched_eip)
-    );*/
-  /*  asm (
+
+    asm (
       "movl %%esp, %0"
       :"=r"(schedule_arr[last]->sched_esp)
     );
@@ -60,12 +79,8 @@ void pit_handler()
       :"=r"(schedule_arr[last]->sched_ebp)
     );
 
-  /*  asm (
-      "movl %0, %%eip"
-      :
-      :"r"(schedule_arr[curr]->sched_eip)
-    );*/
-  /*  asm (
+
+    asm (
       "movl %0, %%esp"
       :
       :"r"(schedule_arr[curr]->sched_esp)
@@ -76,10 +91,17 @@ void pit_handler()
       :"r"(schedule_arr[curr]->sched_ebp)
     );
 
-*/
-  //  tss.esp0 = (uint32_t)(curr_pcb+STACK_SIZE4);
 
+    tss.esp0 = (uint32_t)(curr_pcb)+STACK_SIZE4;
+    tss.ss0 = KERNEL_DS;
 
+    page_directory[32] = mem_locs[curr_pcb->idx] | SURWON;
+
+    //flush tlb
+    asm volatile(
+        "movl %cr3,%eax \n \
+        movl %eax,%cr3"
+    );
 
 
 

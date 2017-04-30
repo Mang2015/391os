@@ -101,4 +101,5 @@ int32_t num_processes;
 int32_t curr_terminal;
 int8_t shell_dirty;
 
+#include "sys_handler_helper.h"
 #endif

@@ -144,6 +144,7 @@ int32_t halt(uint8_t status){
 
     //reset pcb pointer
     curr_pcb = curr_pcb->parent_pcb;
+    demote_pcb_backup(curr_pcb->proc_id/4,curr_pcb);
 
     asm volatile(
         "jmp exec_ret"

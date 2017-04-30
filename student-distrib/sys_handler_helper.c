@@ -87,6 +87,8 @@ void init_kernel_memory(){
     num_processes = 0;
     curr_terminal = SHELL0;
     shell_dirty = 0x001;
+    init_shell();
+    init_shell();
 }
 
 
@@ -152,4 +154,9 @@ void switch_terminal(int32_t shell){
         );
 
     }
+}
+
+
+void demote_pcb_backup(int32_t shell, process_control_block_t* pcb){
+    pcb_backups[shell] = pcb;
 }

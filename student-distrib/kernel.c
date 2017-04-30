@@ -169,7 +169,7 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 
 	/* Initialize PIT */
-	//pit_init();
+	pit_init();
 
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
@@ -181,10 +181,10 @@ entry (unsigned long magic, unsigned long addr)
 //	read_file_by_name("shell");
 //	read_file_by_index();
 //  test_rtc();
+	clear();
+	resetCursor();
 
 	init_kernel_memory();
-	init_shell();
-	init_shell();
 	//create Terminal0
 	int8_t* cmd = "shell";
 	system_handler(SYS_EXECUTE,(uint32_t)cmd,0,0);

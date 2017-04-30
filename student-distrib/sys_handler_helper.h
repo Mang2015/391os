@@ -18,5 +18,6 @@
 void init_kernel_memory();
 void init_shell();
 void switch_terminal(int32_t shell);
+void demote_pcb_backup(int32_t shell,process_control_block_t* pcb);
 
 #endif
