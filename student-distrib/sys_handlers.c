@@ -275,12 +275,7 @@ int32_t execute(const uint8_t* command){
     ----------------*/
     page_directory[32] = mem_locs[process_idx] | SURWON;
     process->proc.idx = process_idx;
-    /*
-    if(num_processes == 1)
-        page_directory[32] = PROCESS_PAGE1 | SURWON;//8MB
-    else
-        page_directory[32] = PROCESS_PAGE2 | SURWON;//12MB
-        */
+
 
     //flush tlb
     asm volatile(

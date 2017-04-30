@@ -102,6 +102,15 @@ void switch_terminal(int32_t shell){
     clear();
     pcb_backups[curr_terminal] = curr_pcb;
 
+    asm (
+        "movl %%ebp, %0"
+        :"=r"(curr_pcb->sched_ebp)
+      );
+    asm (
+        "movl %%esp, %0"
+        :"=r"(curr_pcb->sched_esp)
+      );
+
     curr_terminal = shell;
 
     //creating terminal for the first time
@@ -110,8 +119,6 @@ void switch_terminal(int32_t shell){
         clear_buffer();
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;
-        //save...
-        //send_eoi(1);
         sti();
         system_handler(SYS_EXECUTE,(uint32_t)"shell123",0,0);
     }
@@ -119,12 +126,22 @@ void switch_terminal(int32_t shell){
     //ELSE load video memory and cursor location and keyboard
     else{
       memcpy((void*)VIDEO,(const void*)vid_backups[curr_terminal],4096);
-      //resetCursor();
-      //terminal_write((const char*)VIDEO,2000);
       memcpy((void*)line_char_buffer,(const void*)buf_backups[curr_terminal],128);
       set_buf_idx(buff_idx_backups[curr_terminal]);
       placeCursor(xcoord_backups[curr_terminal],ycoord_backups[curr_terminal]);
       curr_pcb = pcb_backups[curr_terminal];
+      tss.esp0 = (uint32_t)(curr_pcb+STACK_SIZE4);
+      asm (
+          "movl %0, %%ebp"
+          :
+          :"r"(curr_pcb->sched_ebp)
+        );
+      asm (
+            "movl %0, %%esp"
+            :
+            :"r"(curr_pcb->sched_esp)
+        );
+        page_directory[32] = mem_locs[curr_pcb->idx] | SURWON;
+
     }
-  //  sti();
 }
