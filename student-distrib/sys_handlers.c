@@ -74,12 +74,13 @@ int32_t halt(uint8_t status){
     uint32_t i;
 
     //remove process from scheduler and put back child
+    /*
     for(i = 0; i < 3; i++){
       if(schedule_arr[i] == curr_pcb){
         schedule_arr[i] = NULL;
         break;
       }
-    }
+  }*/
 
     if (curr_pcb->proc_id == 0 || curr_pcb->proc_id == 4 || curr_pcb->proc_id == 8)
     {
@@ -90,7 +91,7 @@ int32_t halt(uint8_t status){
 
 
     //add parent process to scheduler
-    schedule_arr[i] = curr_pcb->parent_pcb;
+    schedule_arr[curr_pcb->proc_id/4] = curr_pcb->parent_pcb;
 
     //cli();
 
@@ -202,6 +203,7 @@ int32_t execute(const uint8_t* command){
         cmd[5] = '\0';
         begin_args = 5;
         restart = 1;
+        curr_pcb = &(tasks->task[curr_terminal].proc);
     }
 
     if(num_processes == MAX_PROCESS){
@@ -351,6 +353,10 @@ int32_t execute(const uint8_t* command){
     tss.ss0 = KERNEL_DS;
 
     //add process to be scheduled and remove parent
+    curr = curr_pcb->proc_id/4;
+    schedule_arr[curr] = curr_pcb;
+    new_process[curr] = 1;
+    /*
     if(curr_pcb->proc_id != 0 && curr_pcb->proc_id != 4 && curr_pcb->proc_id != 8){
         for(i = 0; i < 3; i++){
             if(schedule_arr[i] == curr_pcb->parent_pcb){
@@ -362,6 +368,7 @@ int32_t execute(const uint8_t* command){
     else{
         schedule_arr[curr_pcb->proc_id/4] = curr_pcb;
     }
+    */
     //save current esp and ebp to pcb
     asm volatile(
         "movl %%ebp, %0 \n \

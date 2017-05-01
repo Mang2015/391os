@@ -103,7 +103,7 @@ void switch_terminal(int32_t shell){
     memcpy((void*)vid_backups[curr_terminal],(const void*)VIDEO,4096);
     memcpy((void*)buf_backups[curr_terminal],(const void*)line_char_buffer,128);
     clear();
-    pcb_backups[curr_terminal] = curr_pcb;
+    //pcb_backups[curr_terminal] = curr_pcb;
 /*
     asm (
         "movl %%ebp, %0"
@@ -118,7 +118,16 @@ void switch_terminal(int32_t shell){
 
     //creating terminal for the first time
     if(((0x1 << curr_terminal) & shell_dirty) == 0){
+        asm (
+            "movl %%ebp, %0"
+            :"=r"(curr_pcb->sched_ebp)
+          );
+        asm (
+            "movl %%esp, %0"
+            :"=r"(curr_pcb->sched_esp)
+          );
  //       schedule_arr[curr_terminal] = &(tasks->task[curr_terminal].proc);
+//        curr_pcb = &(tasks->task[curr_terminal].proc);
         clear_buffer();
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;

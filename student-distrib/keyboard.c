@@ -480,6 +480,7 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
         }while(enter_flag == 0);
   //  }
 
+
     //empty buffer is being passed
     if (line_char_buffer[0] == '\n') {
       buf[0] = '\0';
