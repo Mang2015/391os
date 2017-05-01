@@ -70,8 +70,8 @@ int32_t halt(uint8_t status){
 
     uint32_t i;
 
-    //remove process from scheduler
-    for(i = 0; i < 6; i++){
+    //remove process from scheduler and put back child
+    for(i = 0; i < 3; i++){
       if(schedule_arr[i] == curr_pcb){
         schedule_arr[i] = NULL;
         break;
@@ -228,6 +228,12 @@ int32_t execute(const uint8_t* command){
     if(restart){
         process_idx = curr_pcb->idx;
         process = &tasks->task[process_idx];
+        for(i = 0; i < 3; i++){
+            if(!schedule_arr[i]){
+                schedule_arr[i] = &(process->proc);
+                break;
+            }
+        }
     }
     else{
         for(i = 0; i < MAX_PROCESS; i++){
@@ -334,17 +340,11 @@ int32_t execute(const uint8_t* command){
     tss.esp0 = (uint32_t)process + STACK_SIZE4;
     tss.ss0 = KERNEL_DS;
 
-    //add process to be scheduled
-    for(i = 0; i < 6; i++){
-      if(schedule_arr[i] == NULL){
-        schedule_arr[i] = curr_pcb;
-        break;
-      }
-    }
+    //add process to be scheduled and remove parent
     if(curr_pcb->proc_id != 0 && curr_pcb->proc_id != 4 && curr_pcb->proc_id != 8){
-        for(i = 0; i < 6; i++){
+        for(i = 0; i < 3; i++){
             if(schedule_arr[i] == curr_pcb->parent_pcb){
-                schedule_arr[i] = NULL;
+                schedule_arr[i] = curr_pcb;
                 break;
             }
         }
