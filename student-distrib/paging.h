@@ -22,6 +22,7 @@
 
 uint32_t page_directory[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
 uint32_t page_table[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
+uint32_t page_table_vid[DIRECTORY_SIZE] __attribute__((aligned (PAGE_SIZE)));
 
 extern void paging_init(void);
 extern void enable_paging();

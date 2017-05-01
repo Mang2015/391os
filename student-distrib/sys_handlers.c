@@ -539,8 +539,8 @@ int32_t vidmap(uint8_t** screen_start){
     }
 
     //initialize page
-    page_directory[VIDMAP_PAGE] = (uint32_t)page_table | URWON;
-    page_table[0] = (uint32_t)VIDEO | URWON;
+    page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
+    page_table_vid[0] = (uint32_t)VIDEO | URWON;
 
     //flush tlb
     asm volatile(

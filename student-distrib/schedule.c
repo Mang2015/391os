@@ -67,23 +67,21 @@ void pit_handler()
     //write code that turns on "display to screen" only for running process
     //processes running in background write to their own backups
 
-/*
-    if((curr_pcb->proc_id)/4 == curr_terminal){
-        page_table[VIDEO>>12] = VIDEO | RWON;
-    }else{
 
+    if((curr_pcb->proc_id)/4 != curr_terminal){
         int term_to_write = (curr_pcb->proc_id)/4;
-        page_table[(VIDEO>>12)] = sched_vid_backups[term_to_write] | RWON;
-
+        page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
+        page_table_vid[0] = sched_vid_backups[term_to_write] | URWON;
+    }else{
+      page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
+      page_table_vid[0] = VIDEO | URWON;
     }
 
-     //flush tlb
-    asm volatile(
-        "movl %cr3,%eax \n \
-        movl %eax,%cr3"
-    );
-    */
-
+    //flush tlb
+   asm volatile(
+       "movl %cr3,%eax \n \
+       movl %eax,%cr3"
+   );
 
 
     //context switching
