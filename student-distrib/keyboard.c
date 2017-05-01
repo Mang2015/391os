@@ -259,35 +259,6 @@ void space_press(){
  */
 void enter_press(){
   enter_flag = 1;
-  //uint32_t j;
-  //uint32_t y_coord;
-  /* Prints our shell line to screen on a new line once enter is pressed */
-/*  if (line_char_buffer[0] == '\n' || line_char_buffer[0] == ' ') {
-    putc('\n');
-    putc('3');
-    putc('9');
-    putc('1');
-    putc('O');
-    putc('S');
-    putc('>');
-    putc(' ');
-
-    // clear buffer
-    buffIdx = -1;
-
-    for(j = 0; j < BUFFER_SIZE; j++) {
-      line_char_buffer[j] = '\0';
-    }
-
-    y_coord = coordReturn(0);
-
-    // reload position of cursor
-    placeCursor(7, y_coord);
-    buffIdx++;
-    line_char_buffer[buffIdx] = '\n';
-    return;
-
-  } */
 
   int32_t i;
   buffIdx = -1;
@@ -298,7 +269,7 @@ void enter_press(){
       buffIdx++;
       line_char_buffer[buffIdx] = '\n';
       //print newline
-//      if (first_flag)
+
         putc('\n');
 
       return;
@@ -515,19 +486,11 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
       j++;
     }
 
-    // If that character is in the bounds of the buffer, replace it with new line char
-//    if (j != 129)
+    // fill null terminating space in buffer with nl char
      buf[j] = '\n';
 
-      //if the last character in the buffer is not a null terminating char, then replace with
-      // new line char and return i+1 bytes
-/*
-    if (buf[BUFFER_MAX_INDEX] != '\0') {
-        buf[BUFFER_MAX_INDEX] = '\n';
-        return i + 1;
-      }
-*/
 
+    // return # of bytes
     return j+1;//i+2
 }
 
