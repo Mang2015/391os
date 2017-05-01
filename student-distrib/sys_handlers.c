@@ -189,6 +189,7 @@ int32_t execute(const uint8_t* command){
     int32_t process_idx;
     int32_t i = 0, j;
     int32_t restart = 0;
+    int32_t begin_args;
 
 
     if(strncmp((int8_t*)command,"shell123",RESTART_SIZE) == 0){
@@ -199,7 +200,7 @@ int32_t execute(const uint8_t* command){
         cmd[3] = 'l';
         cmd[4] = 'l';
         cmd[5] = '\0';
-        i = 5;
+        begin_args = 5;
         restart = 1;
     }
 
@@ -231,6 +232,7 @@ int32_t execute(const uint8_t* command){
             i++;
         }
           cmd[i] = '\0';
+          begin_args = i;
     }
 
     //get crrent process
@@ -238,12 +240,6 @@ int32_t execute(const uint8_t* command){
     if(restart){
         process_idx = curr_pcb->idx;
         process = &tasks->task[process_idx];
-        for(i = 0; i < 3; i++){
-            if(!schedule_arr[i]){
-                schedule_arr[i] = &(process->proc);
-                break;
-            }
-        }
     }
     else{
         for(i = 0; i < MAX_PROCESS; i++){
@@ -257,7 +253,7 @@ int32_t execute(const uint8_t* command){
     }
 
     //copy arguments of the command into the argument pcb buffer
-    strncpy(process->proc.arguments,(const int8_t*)(command+i+1),128);
+    strncpy(process->proc.arguments,(const int8_t*)(command+begin_args+1),128);
     j = 0;
     while(process->proc.arguments[j] != '\0' && process->proc.arguments[j] != '\n'){
         j++;
@@ -362,6 +358,9 @@ int32_t execute(const uint8_t* command){
                 break;
             }
         }
+    }
+    else{
+        schedule_arr[curr_pcb->proc_id/4] = curr_pcb;
     }
     //save current esp and ebp to pcb
     asm volatile(
@@ -509,7 +508,7 @@ int32_t getargs(uint8_t* buf, int32_t nbytes){
 
     //arguments don't exist
     if(curr_pcb->arguments[0] == '\0')
-        return 0;
+        return -1;
 
     //copy over the argument buffer into the passed in user level buffer
     strncpy((int8_t*)buf,curr_pcb->arguments,nbytes);

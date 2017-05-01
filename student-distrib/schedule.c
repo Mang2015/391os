@@ -32,34 +32,37 @@ void pit_handler()
     send_eoi(PIT_IRQ_NUM);
     if(!setup)
         return;
-    uint32_t flags;
-    cli_and_save(flags);
+ //   uint32_t flags;
+  //  cli_and_save(flags);
 
     //move to next process
     int32_t last = curr;
-//    int32_t i;
-    curr = (curr+1) % 3;
-/*    for(i = 0; i < 3; i++){
+    int32_t i;
+    for(i = 0; i < 3; i++){
+        curr = (curr+1) % 3;
         if(schedule_arr[curr])
             break;
     }
-    */
 
     //no processes to schedule or nothing to update
     if(curr_pcb == schedule_arr[curr] || !schedule_arr[curr]){
         return;
     }
-
-    if(!(shell_dirty & (0x1 << curr)))
-        return;
-
+    /*
+    if(schedule_arr[curr]->proc_id == 0 || schedule_arr[curr]->proc_id == 4
+        || schedule_arr[curr]->proc_id == 8){
+            if(schedule_arr[curr]->proc_id/4 != curr_terminal)
+                return;
+        }
+        */
     curr_pcb = schedule_arr[curr];
+
 
 
     //write code that turns on "display to screen" only for running process
     //processes running in background write to their own backups
 
-/*
+
     if((curr_pcb->proc_id)/4 == curr_terminal){
         page_table[VIDEO>>12] = VIDEO | RWON;
     }else{
@@ -74,20 +77,13 @@ void pit_handler()
         "movl %cr3,%eax \n \
         movl %eax,%cr3"
     );
-*/
+
 
 
     //context switching
     tss.esp0 = (uint32_t)(curr_pcb)+STACK_SIZE4;
     tss.ss0 = KERNEL_DS;
 
-    page_directory[32] = mem_locs[curr_pcb->idx] | SURWON;
-
-    //flush tlb
-    asm volatile(
-        "movl %cr3,%eax \n \
-        movl %eax,%cr3"
-    );
 
     if(last != -1 && schedule_arr[last]){
         asm (
@@ -113,6 +109,13 @@ void pit_handler()
     );
 
 
+    page_directory[32] = mem_locs[curr_pcb->idx] | SURWON;
 
-    restore_flags(flags);
+    //flush tlb
+    asm volatile(
+        "movl %cr3,%eax \n \
+        movl %eax,%cr3"
+    );
+
+   // restore_flags(flags);
 }
