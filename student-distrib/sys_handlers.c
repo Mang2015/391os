@@ -82,7 +82,7 @@ int32_t halt(uint8_t status){
       }
   }*/
 
-    if (curr_pcb->proc_id == 0 || curr_pcb->proc_id == 4 || curr_pcb->proc_id == 8)
+    if (curr_pcb->proc_id == TERM0ID || curr_pcb->proc_id == TERM1ID || curr_pcb->proc_id == TERM2ID)
     {
         // restart shell
         printf("Restarting shell...\n");
@@ -247,7 +247,7 @@ int32_t execute(const uint8_t* command){
     }
 
     //copy arguments of the command into the argument pcb buffer
-    strncpy(process->proc.arguments,(const int8_t*)(command+begin_args+1),128);
+    strncpy(process->proc.arguments,(const int8_t*)(command+begin_args+1),BUFFER_SIZE);
     j = 0;
     //find end of line character
     while(process->proc.arguments[j] != '\0' && process->proc.arguments[j] != '\n'){
@@ -512,7 +512,7 @@ int32_t getargs(uint8_t* buf, int32_t nbytes){
     //error check
     if(buf == NULL)
       return -1;
-    if(nbytes > 128) nbytes = 128;
+    if(nbytes > BUFFER_SIZE) nbytes = BUFFER_SIZE;
 
     //arguments don't exist
     if(curr_pcb->arguments[0] == '\0')
