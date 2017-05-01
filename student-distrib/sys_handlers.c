@@ -385,6 +385,9 @@ int32_t execute(const uint8_t* command){
     ----------------------------*/
     restore_flags(flags);
     setup = 1;
+    if(restart){
+      sti();
+    }
 
     asm volatile(
           "switch: \n \
