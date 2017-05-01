@@ -16,6 +16,7 @@
 #define PIT_MODE_3 0x36
 #define DIV_100HZ 1193180/100
 #define MASK_FREQ 0xFF
+#define SCHED_SIZE 3
 
 int32_t curr;
 

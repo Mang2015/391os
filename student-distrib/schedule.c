@@ -3,6 +3,12 @@
 
 uint32_t sched_vid_backups[] = {BACKUP0,BACKUP1,BACKUP2};
 
+/*pit_init
+* input - none
+* outpt - none
+* side effects - enables pit interrpts on PIC
+* description - initializes PIT for scheduler
+*/
 void pit_init(void)
 {
     /*
@@ -19,7 +25,7 @@ void pit_init(void)
 
     // enable interrupts on PIC
     enable_irq(PIT_IRQ_NUM);
-    for(i = 0; i < 3; i++){
+    for(i = 0; i < SCHED_SIZE; i++){
         schedule_arr[i] = NULL;
         new_process[i] = 1;
     }
@@ -28,7 +34,12 @@ void pit_init(void)
 }
 
 
-
+/*pit_handler
+* input - none
+* outpt - none
+* side effects - context switch to next scheduled process
+* description - is used to implement round robin scheduling
+*/
 void pit_handler()
 {
     send_eoi(PIT_IRQ_NUM);
@@ -40,8 +51,8 @@ void pit_handler()
     //move to next process
     int32_t last = curr;
     int32_t i;
-    for(i = 0; i < 3; i++){
-        curr = (curr+1) % 3;
+    for(i = 0; i < SCHED_SIZE; i++){
+        curr = (curr+1) % SCHED_SIZE;
         if(schedule_arr[curr])
             break;
     }
@@ -67,14 +78,15 @@ void pit_handler()
     //write code that turns on "display to screen" only for running process
     //processes running in background write to their own backups
 
-
-    //HOW TF 
+    //if next process is not in the active terminal write to backup video memory
     if((schedule_arr[curr]->proc_id)/4 != curr_terminal){
         int term_to_write = (curr_pcb->proc_id)/4;
         page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
         page_table_vid[0] = sched_vid_backups[term_to_write] | URWON;
         page_table[VIDEO >> 12] = sched_vid_backups[term_to_write] | RWON;
-    }else{
+    }
+    //next process is in current terminal so write to active memory
+    else{
       page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
       page_table_vid[0] = VIDEO | URWON;
       page_table[VIDEO >> 12] = VIDEO | URWON;
@@ -91,7 +103,7 @@ void pit_handler()
     tss.esp0 = (uint32_t)(schedule_arr[curr])+STACK_SIZE4;
     tss.ss0 = KERNEL_DS;
 
-
+    //save old esp/ebp
     if(schedule_arr[last]){
         asm (
           "movl %%esp, %0"
@@ -103,7 +115,7 @@ void pit_handler()
         );
     }
 
-
+    //restore new esp/ebp
     asm (
       "movl %0, %%esp"
       :
@@ -115,7 +127,7 @@ void pit_handler()
       :"r"(schedule_arr[curr]->sched_ebp)
     );
 
-
+    //set paging to new process
     page_directory[32] = mem_locs[schedule_arr[curr]->idx] | SURWON;
 
     //flush tlb
