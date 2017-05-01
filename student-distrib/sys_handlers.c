@@ -192,7 +192,7 @@ int32_t execute(const uint8_t* command){
     int32_t restart = 0;
     int32_t begin_args;
 
-
+    //check for restart command
     if(strncmp((int8_t*)command,"shell123",RESTART_SIZE) == 0){
         num_processes--;
         cmd[0] = 's';
@@ -206,6 +206,7 @@ int32_t execute(const uint8_t* command){
         curr_pcb = &(tasks->task[curr_terminal].proc);
     }
 
+    //limit number of processes written
     if(num_processes == MAX_PROCESS){
         printf("Max processes already running\n");
         restore_flags(flags);
@@ -217,17 +218,6 @@ int32_t execute(const uint8_t* command){
     /*--------------
     PARSE ARGUMENT
     ----------------*/
-  /*  if(strncmp((int8_t*)command,"shell123",RESTART_SIZE) == 0){
-        num_processes--;
-        cmd[0] = 's';
-        cmd[1] = 'h';
-        cmd[2] = 'e';
-        cmd[3] = 'l';
-        cmd[4] = 'l';
-        cmd[5] = '\0';
-        i = 5;
-        restart = 1;
-    }*/
     if(!restart){
         while(((int8_t)command[i] != ' ') && ((int8_t)command[i] != '\0') && ((int8_t)command[i] != '\n')){
             cmd[i] = command[i];
@@ -240,10 +230,12 @@ int32_t execute(const uint8_t* command){
     //get crrent process
     task_stack_t *process;
     if(restart){
+        //curr_pcb is already set
         process_idx = curr_pcb->idx;
         process = &tasks->task[process_idx];
     }
     else{
+        //find an open task and fill it with process
         for(i = 0; i < MAX_PROCESS; i++){
             if(tasks->task[i].in_use == OFF){
                tasks->task[i].in_use = ON;
@@ -257,17 +249,20 @@ int32_t execute(const uint8_t* command){
     //copy arguments of the command into the argument pcb buffer
     strncpy(process->proc.arguments,(const int8_t*)(command+begin_args+1),128);
     j = 0;
+    //find end of line character
     while(process->proc.arguments[j] != '\0' && process->proc.arguments[j] != '\n'){
         j++;
     }
     process->proc.arguments[j] = '\0';
 
+    //read in dentry
     if(dread(cmd,&d) == -1 || d.ftype != FILE_TYPE){
         num_processes--;
         tasks->task[process_idx].in_use = OFF;
         restore_flags(flags);
         return -1;
     }
+    //read in 4 bytes to check if executable
     if(fread(d.inode_num,0,exe,BUF4) != BUF4){
         num_processes--;
         tasks->task[process_idx].in_use = OFF;
@@ -347,8 +342,10 @@ int32_t execute(const uint8_t* command){
     for(j=2; j<MAX_FD; j++)
         process->proc.file_arr[j].flags = OFF;
 
+    //set curr_pcb
     curr_pcb = &(process->proc);
 
+    //set tss
     tss.esp0 = (uint32_t)process + STACK_SIZE4;
     tss.ss0 = KERNEL_DS;
 
@@ -385,6 +382,7 @@ int32_t execute(const uint8_t* command){
     ----------------------------*/
     restore_flags(flags);
     setup = 1;
+    //turn on interrupts if its a restart
     if(restart){
       sti();
     }
