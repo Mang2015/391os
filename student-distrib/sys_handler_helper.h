@@ -14,7 +14,7 @@
 #define SHELL1 1
 #define SHELL2 2
 #define NUM_TERMINALS 3
-#define USER_PROG
+#define USER_PROG 32
 #define PG_SIZE 4096
 
 
