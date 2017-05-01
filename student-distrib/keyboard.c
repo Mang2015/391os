@@ -528,7 +528,7 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
       }
 */
 
-    return j+2;//i+2
+    return j+1;//i+2
 }
 
 /* keyboard_driver
