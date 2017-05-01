@@ -2,6 +2,7 @@ ALL BUGS:
 
 1) GREP NOT WORKING
 2) "CAT (space)" not working
+    - return -1
 3)  Ctrl + l would result in a continuation of the previous line
     - Resolved by adding a condition in keyboard read that would enable enter flag and send in empty buffer, similar to pressing enter. Enter flag would then be disabled within a condition in keyboard read
 4) PAGE FAULT EXITING OUT OF TERMS 1 AND 2
@@ -56,4 +57,6 @@ ALL BUGS:
 38) Boot loop because ESP, EBP were not saved at all from the old process
 39) Processes still show in the background of other terminals - not writing to non-video memory
 40) vidmap system call mapped page directory entries to same page table, thus causing the page table to have the same pointer
-41)
+41) Exiting directly from first shell in first terminal causes the keyboard to stop working
+42) Filling buffer in hello cuts off last character and replaces with '&'
+    - doesnt cut off last character, adds an & however
