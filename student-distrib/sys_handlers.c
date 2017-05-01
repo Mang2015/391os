@@ -423,6 +423,8 @@ int32_t execute(const uint8_t* command){
 int32_t read(int32_t fd, void* buf, int32_t nbytes){
     if(fd < 0 || fd >= MAX_FD || curr_pcb->file_arr[fd].flags == OFF)
         return -1;
+    if(buf == NULL)
+        return -1;
     return curr_pcb->file_arr[fd].table(READ,fd,buf,nbytes);
 }
 
@@ -438,6 +440,8 @@ int32_t read(int32_t fd, void* buf, int32_t nbytes){
 int32_t write(int32_t fd, const void* buf, int32_t nbytes){
     if(fd < 0 || fd >= MAX_FD || curr_pcb->file_arr[fd].flags == OFF)
         return -1;
+    if(buf == NULL)
+      return -1;
     return curr_pcb->file_arr[fd].table(WRITE,fd,(void*)buf,nbytes);
 }
 
