@@ -168,6 +168,8 @@ int32_t halt(uint8_t status){
  */
 int32_t execute(const uint8_t* command){
 
+    cli();
+
     if(command == NULL)
       return -1;
 
@@ -379,6 +381,8 @@ int32_t execute(const uint8_t* command){
         :
         :"r"(eip_val)
     );
+
+    sti();
 
     //IRET
     asm ("iret");
