@@ -240,11 +240,10 @@ void keyboardBuff(uint8_t keyboard_read) {
 void space_press(){
 
     //check for buffer overflow and handle apporpriately
-    buffIdx++;
-    if(buffIdx == BUFFER_SIZE){
-      buffIdx--;
+    if(buffIdx == BUFFER_MAX_INDEX  ){
       return;
     }
+    buffIdx++;
 
     //print and add space to buffer and screen
     putc(' ');
@@ -313,7 +312,12 @@ void enter_press(){
   }
 }
 
-
+/* void enter_release
+ * inputs: none
+ * outputs: none
+ * side effects: clears enter_flag
+ * function: handler for when the enter key is released
+ */
 void enter_release(){
     enter_flag = 0;
 }
@@ -410,7 +414,7 @@ void clearScreen() {
 
   //pass empty
   line_char_buffer[0] = '\n';
-  buffIdx = -2;
+  buffIdx = QUIT;
   return;
 }
 
@@ -424,6 +428,12 @@ int get_buf_idx(){
     return buffIdx;
 }
 
+/* void set_buf_idx
+ * inputs: int32_t index
+ * outputs: none
+ * side effects: changes buffIdx
+ * function: used to change buffer index
+ */
 void set_buf_idx(int32_t index){
   buffIdx = index;
 }
@@ -475,7 +485,7 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
             for(i=0;i<byte_count;i++){
                 buf[i] = line_char_buffer[i];
             }
-            if (buffIdx == -2)
+            if (buffIdx == QUIT)
               enter_flag = 1;
         }while(enter_flag == 0);
   //  }
@@ -507,16 +517,16 @@ int32_t keyboard_read(char* buf, uint32_t byte_count){
 
     // If that character is in the bounds of the buffer, replace it with new line char
 //    if (j != 129)
-      buf[j] = '\n';
+     buf[j] = '\n';
 
       //if the last character in the buffer is not a null terminating char, then replace with
       // new line char and return i+1 bytes
-
-    if (buf[127] != '\0') {
-        buf[127] = '\n';
+/*
+    if (buf[BUFFER_MAX_INDEX] != '\0') {
+        buf[BUFFER_MAX_INDEX] = '\n';
         return i + 1;
       }
-
+*/
 
     return j+2;//i+2
 }
@@ -548,7 +558,7 @@ int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_coun
 
 void clear_buffer(){
   int32_t i;
-  for(i = 0; i < 128; i++){
+  for(i = 0; i < BUFFER_SIZE; i++){
     line_char_buffer[i] = '\0';
   }
   buffIdx = -1;

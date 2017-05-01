@@ -169,7 +169,7 @@ entry (unsigned long magic, unsigned long addr)
 	paging_init();
 
 	/* Initialize PIT */
-	pit_init();
+	//pit_init();
 
 	init_kernel_memory();
 	/* Enable interrupts */

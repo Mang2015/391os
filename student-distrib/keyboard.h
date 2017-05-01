@@ -32,7 +32,8 @@
 #define ENTER_RELEASE 0x9C
 #define SPACE_PRESS 0x39
 #define BUFFER_MAX_INDEX 127
-#define BUFFER_SIZE 128
+#define BUFFER_SIZE 129
+#define QUIT -2
 
 
 extern void keyboard_init(void);
@@ -58,7 +59,7 @@ int32_t keyboard_close();
 int32_t keyboard_read(int8_t* buf, uint32_t byte_count);
 int32_t keyboard_driver(uint32_t cmd, uint32_t fd, void* buf, uint32_t byte_count);
 
-volatile extern uint8_t line_char_buffer[128];
+volatile extern uint8_t line_char_buffer[BUFFER_SIZE];
 
 
 #endif
