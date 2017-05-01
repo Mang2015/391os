@@ -68,13 +68,15 @@ void pit_handler()
     //processes running in background write to their own backups
 
 
-    if((curr_pcb->proc_id)/4 != curr_terminal){
+    if((schedule_arr[curr]->proc_id)/4 != curr_terminal){
         int term_to_write = (curr_pcb->proc_id)/4;
         page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
         page_table_vid[0] = sched_vid_backups[term_to_write] | URWON;
+        page_table[VIDEO >> 12] = sched_vid_backups[term_to_write] | RWON;
     }else{
       page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
       page_table_vid[0] = VIDEO | URWON;
+      page_table[VIDEO >> 12] = VIDEO | URWON;
     }
 
     //flush tlb
