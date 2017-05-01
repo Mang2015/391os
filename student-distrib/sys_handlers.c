@@ -377,6 +377,8 @@ int32_t execute(const uint8_t* command){
     PUSH IRET CONTEXT TO STACK
     AND CALL IRET
     ----------------------------*/
+    restore_flags(flags);
+    setup = 1;
 
     asm volatile(
           "switch: \n \
@@ -394,7 +396,6 @@ int32_t execute(const uint8_t* command){
         :"r"(eip_val)
     );
 
-    restore_flags(flags);
 
     //IRET
     asm ("iret");

@@ -94,12 +94,13 @@ typedef struct kernel_tasks{//48KB
 process_control_block_t *curr_pcb;
 kernel_tasks_t *tasks;
 
-process_control_block_t *schedule_arr[6];
+process_control_block_t *schedule_arr[3];
 
 uint32_t mem_locs[MAX_PROCESS];
 int32_t num_processes;
 int32_t curr_terminal;
 int8_t shell_dirty;
+int8_t setup;
 
 #include "sys_handler_helper.h"
 #endif

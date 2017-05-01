@@ -89,12 +89,16 @@ void init_kernel_memory(){
     shell_dirty = 0x001;
     init_shell();
     init_shell();
+    schedule_arr[0] = &(tasks->task[0].proc);
+    setup = 0;
 }
 
 
 void switch_terminal(int32_t shell){
     if(shell == curr_terminal || shell < SHELL0 || shell > SHELL2)
       return;
+ //   uint32_t flags;
+//    cli_and_save(flags);
     //save video memory and cursor position of current task and keyboard
     xcoord_backups[curr_terminal] = coordReturn(1);
     ycoord_backups[curr_terminal] = coordReturn(0);
@@ -118,9 +122,11 @@ void switch_terminal(int32_t shell){
     //creating terminal for the first time
     if(((0x1 << curr_terminal) & shell_dirty) == 0){
         curr_pcb = &(tasks->task[curr_terminal].proc);
+        schedule_arr[curr_terminal] = curr_pcb;
         clear_buffer();
         resetCursor();
         shell_dirty |= 0x1 << curr_terminal;
+//        restore_flags(flags);
         sti();
         system_handler(SYS_EXECUTE,(uint32_t)"shell123",0,0);
     }
@@ -154,6 +160,7 @@ void switch_terminal(int32_t shell){
         );
 
     }
+//        restore_flags(flags);
 }
 
 

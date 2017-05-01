@@ -151,12 +151,18 @@ void keyboard_handler()
       AltStatus(keyboard_read);
     else if ((keyboard_read == L_CLEAR) && (ctrl_flag == 1))
       clearScreen();
-    else if ((keyboard_read == F2_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0))
-      switch_terminal(SHELL1);
-    else if ((keyboard_read == F1_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0))
-      switch_terminal(SHELL0);
-    else if ((keyboard_read == F3_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0))
-      switch_terminal(SHELL2);
+    else if ((keyboard_read == F2_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0)){
+        restore_flags(f);
+        switch_terminal(SHELL1);
+    }
+    else if ((keyboard_read == F1_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0)){
+        restore_flags(f);
+        switch_terminal(SHELL0);
+    }
+    else if ((keyboard_read == F3_PRESS) && (alt_flag == 1) && (ctrl_flag == 0) && (shift_flag == 0)){
+        restore_flags(f);
+        switch_terminal(SHELL2);
+    }
     else if ((keyboard_read == LSHIFT_PRESS) || (keyboard_read == LSHIFT_RELEASE) || (keyboard_read == RSHIFT_PRESS) || (keyboard_read == RSHIFT_RELEASE))
       LRshift(keyboard_read);
     else if (keyboard_read == CAPS)

@@ -171,6 +171,7 @@ entry (unsigned long magic, unsigned long addr)
 	/* Initialize PIT */
 	pit_init();
 
+	init_kernel_memory();
 	/* Enable interrupts */
 	/* Do not enable the following until after you have set up your
 	 * IDT correctly otherwise QEMU will triple fault and simple close
@@ -184,7 +185,6 @@ entry (unsigned long magic, unsigned long addr)
 	clear();
 	resetCursor();
 
-	init_kernel_memory();
 	//create Terminal0
 	int8_t* cmd = "shell";
 	system_handler(SYS_EXECUTE,(uint32_t)cmd,0,0);
