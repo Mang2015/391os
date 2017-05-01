@@ -68,6 +68,9 @@ int32_t system_handler(uint32_t instr, uint32_t arg0, uint32_t arg1, uint32_t ar
  */
 int32_t halt(uint8_t status){
 
+    uint32_t flags;
+    cli_and_save(flags);
+
     uint32_t i;
 
     //remove process from scheduler and put back child
@@ -150,10 +153,11 @@ int32_t halt(uint8_t status){
     curr_pcb = curr_pcb->parent_pcb;
     demote_pcb_backup(curr_pcb->proc_id/4,curr_pcb);
 
+    restore_flags(flags);
+
     asm volatile(
         "jmp exec_ret"
     );
-
     //this is never actually used
     return 0;
 }
@@ -168,10 +172,13 @@ int32_t halt(uint8_t status){
  */
 int32_t execute(const uint8_t* command){
 
-    cli();
+    uint32_t flags;
+    cli_and_save(flags);
 
-    if(command == NULL)
+    if(command == NULL){
+      restore_flags(flags);
       return -1;
+    }
 
     //command line buffer
     int8_t cmd[CMD_BUF];
@@ -198,6 +205,7 @@ int32_t execute(const uint8_t* command){
 
     if(num_processes == MAX_PROCESS){
         printf("Max processes already running\n");
+        restore_flags(flags);
         return -1;
     }
     num_processes++;
@@ -259,11 +267,13 @@ int32_t execute(const uint8_t* command){
     if(dread(cmd,&d) == -1 || d.ftype != FILE_TYPE){
         num_processes--;
         tasks->task[process_idx].in_use = OFF;
+        restore_flags(flags);
         return -1;
     }
     if(fread(d.inode_num,0,exe,BUF4) != BUF4){
         num_processes--;
         tasks->task[process_idx].in_use = OFF;
+        restore_flags(flags);
         return -1;
     }
 
@@ -274,6 +284,7 @@ int32_t execute(const uint8_t* command){
     if(exe[0] != EXE0 || exe[1] != EXE1 || exe[2] != EXE2 || exe[3] != EXE3){
         num_processes--;
         tasks->task[process_idx].in_use = OFF;
+        restore_flags(flags);
         return -1;
     }
 
@@ -303,6 +314,7 @@ int32_t execute(const uint8_t* command){
     if(fread(d.inode_num,0,prog_ptr,length) != length){
         num_processes--;
         tasks->task[process_idx].in_use = OFF;
+        restore_flags(flags);
         return -1;
     }
 
@@ -382,7 +394,7 @@ int32_t execute(const uint8_t* command){
         :"r"(eip_val)
     );
 
-    sti();
+    restore_flags(flags);
 
     //IRET
     asm ("iret");
