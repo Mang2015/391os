@@ -68,6 +68,7 @@ void pit_handler()
     //processes running in background write to their own backups
 
 
+    //HOW TF 
     if((schedule_arr[curr]->proc_id)/4 != curr_terminal){
         int term_to_write = (curr_pcb->proc_id)/4;
         page_directory[VIDMAP_PAGE] = (uint32_t)page_table_vid | URWON;
